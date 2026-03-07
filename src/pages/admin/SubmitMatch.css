@@ -1,0 +1,22 @@
+.admin-submit-match {
+  max-width: 500px;
+  margin: 0 auto;
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+}
+.admin-submit-match .form-group {
+  margin-bottom: 20px;
+}
+.admin-submit-match label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+.admin-submit-match select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+}

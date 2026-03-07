@@ -1,0 +1,85 @@
+.admin-table-wrapper {
+  overflow-x: auto;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px;
+}
+
+.admin-table th {
+  text-align: left;
+  padding: 14px 16px;
+  background: #f8f9fa;
+  color: #495057;
+  font-weight: 600;
+  font-size: 14px;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.admin-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #e9ecef;
+  font-size: 14px;
+}
+
+.admin-table tr:hover {
+  background: #f8f9fa;
+  cursor: pointer;
+}
+
+.admin-table-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.admin-action-btn {
+  padding: 4px 10px;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  background: #e9ecef;
+  color: #333;
+}
+.admin-action-btn:hover {
+  background: #dee2e6;
+}
+.admin-action-confirm {
+  background: #28a745;
+  color: white;
+}
+.admin-action-confirm:hover {
+  background: #218838;
+}
+.admin-action-reject {
+  background: #dc3545;
+  color: white;
+}
+.admin-action-reject:hover {
+  background: #c82333;
+}
+.admin-action-view {
+  background: #0a4b8c;
+  color: white;
+}
+.admin-action-view:hover {
+  background: #083b6f;
+}
+.admin-action-danger {
+  background: #dc3545;
+  color: white;
+}
+.admin-action-danger:hover {
+  background: #c82333;
+}
+
+.admin-table-empty {
+  text-align: center;
+  color: #999;
+  padding: 30px;
+}

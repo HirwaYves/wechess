@@ -1,0 +1,78 @@
+/* src/components/admin/AdminSidebar.css */
+.admin-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 260px;
+  height: 100vh;
+  background: white;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease;
+  z-index: 1000;
+}
+.admin-sidebar-header {
+  padding: 24px 20px;
+  border-bottom: 1px solid #e9ecef;
+}
+.admin-logo {
+  height: 40px;
+  width: auto;
+}
+.admin-sidebar-nav {
+  flex: 1;
+  padding: 20px 0;
+}
+.admin-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 24px;
+  color: #495057;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+.admin-nav-item:hover {
+  background: #f8f9fa;
+}
+.admin-nav-active {
+  background: #e8f0fe;
+  color: #0a4b8c;
+  border-left: 3px solid #c9a24b;
+}
+.admin-nav-icon {
+  font-size: 20px;
+  width: 24px;
+  text-align: center;
+}
+.admin-sidebar-footer {
+  border-top: 1px solid #e9ecef;
+  padding: 16px 0;
+}
+.admin-logout-btn {
+  width: 100%;
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  text-align: left;
+}
+.admin-sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.3);
+  z-index: 999;
+}
+@media (max-width: 768px) {
+  .admin-sidebar {
+    transform: translateX(-100%);
+  }
+  .admin-sidebar-open {
+    transform: translateX(0);
+  }
+}

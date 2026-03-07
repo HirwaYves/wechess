@@ -1,0 +1,22 @@
+.admin-create-tournament {
+  max-width: 600px;
+  margin: 0 auto;
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+}
+.admin-create-tournament h1 {
+  margin-top: 0;
+  color: #0a4b8c;
+}
+.admin-create-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.admin-form-actions {
+  display: flex;
+  gap: 16px;
+  margin-top: 20px;
+}

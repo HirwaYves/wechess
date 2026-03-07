@@ -1,0 +1,234 @@
+/* ========== Tournament Page ========== */
+.tournaments-page {
+  padding: 2rem 0;
+  background: var(--light-gray, #f8f9fa);
+  min-height: 80vh;
+}
+
+.page-title {
+  margin-bottom: 2rem;
+  color: var(--primary, #0B3D91);
+  font-size: 2rem;
+  text-align: center;
+}
+
+/* Header with selector and register button */
+.tournament-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  margin: 2rem 0 1rem;
+}
+
+.tournament-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.tournament-selector label {
+  font-weight: 500;
+  color: var(--text-dark, #333);
+  white-space: nowrap;
+}
+
+.tournament-selector select {
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--primary, #0B3D91);
+  border-radius: 30px;
+  font-size: 1rem;
+  background: white;
+  cursor: pointer;
+  min-width: 200px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.tournament-selector select:focus {
+  outline: none;
+  border-color: var(--secondary, #D4AF37);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+}
+
+/* Register button – premium gold */
+.register-btn {
+  padding: 0.6rem 1.8rem;
+  background: linear-gradient(135deg, var(--secondary, #D4AF37), #b88e3a);
+  color: white;
+  border: none;
+  border-radius: 40px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 10px rgba(180, 130, 50, 0.3);
+  white-space: nowrap;
+}
+.register-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(180, 130, 50, 0.4);
+}
+.register-btn:disabled {
+  opacity: 0.6;
+  transform: none;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+/* View toggle buttons */
+.view-toggle {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+.view-toggle button {
+  padding: 0.5rem 1.5rem;
+  border: 2px solid var(--primary, #0B3D91);
+  background: transparent;
+  border-radius: 30px;
+  font-weight: 500;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--primary, #0B3D91);
+}
+.view-toggle button.active {
+  background: var(--primary, #0B3D91);
+  color: white;
+  border-color: var(--primary, #0B3D91);
+}
+.view-toggle button:hover:not(.active) {
+  background: var(--primary, #0B3D91);
+  color: white;
+}
+
+/* Loading / empty states */
+.loading-indicator,
+.no-data {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-light, #6c757d);
+  font-style: italic;
+  font-size: 1.2rem;
+}
+
+/* Standings table */
+.standings-table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  margin-top: 1rem;
+}
+
+.standings-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px; /* ensures horizontal scroll on small screens */
+  font-size: 0.95rem;
+}
+
+.standings-table th {
+  text-align: left;
+  padding: 1rem 0.5rem;
+  background: #f2f5f9;
+  color: var(--primary, #0B3D91);
+  font-weight: 600;
+  border-bottom: 2px solid #e0e6ed;
+  white-space: nowrap;
+}
+
+.standings-table td {
+  padding: 0.8rem 0.5rem;
+  border-bottom: 1px solid #f0f3f7;
+  vertical-align: middle;
+}
+
+.standings-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Zebra striping for readability */
+.standings-table tbody tr:nth-child(even) {
+  background: #fafcfd;
+}
+
+.standings-table tbody tr:hover {
+  background: #f8fbff;
+}
+
+/* Highlight current user's row */
+.current-user-row {
+  background-color: rgba(212, 175, 55, 0.1) !important;
+  font-weight: 500;
+}
+.current-user-row:hover {
+  background-color: rgba(212, 175, 55, 0.2) !important;
+}
+
+/* Buchholz column: prevent wrapping */
+.standings-table td:last-child {
+  white-space: nowrap;
+}
+
+/* Responsive column control */
+@media (max-width: 768px) {
+  .country-col,
+  .player-col {
+    display: none;
+  }
+  .username-col {
+    display: table-cell;
+  }
+  .standings-table th,
+  .standings-table td {
+    font-size: 0.85rem;
+    padding: 0.6rem 0.3rem;
+  }
+  .standings-table {
+    min-width: 500px; /* allow more columns to fit */
+  }
+}
+
+@media (min-width: 769px) {
+  .username-col {
+    display: none; /* hide username on desktop */
+  }
+  .player-col,
+  .country-col {
+    display: table-cell;
+  }
+}
+
+/* ========== Navbar Logout Button ========== */
+.nav-logout {
+  background: none;
+  border: 2px solid var(--secondary, #D4AF37);
+  color: var(--secondary, #D4AF37);
+  padding: 0.3rem 1rem;
+  border-radius: 30px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-left: 0.5rem;
+}
+.nav-logout:hover {
+  background: var(--secondary, #D4AF37);
+  color: white;
+}
+
+/* Optional: logged-in username button */
+.nav-user {
+  background: none;
+  border: none;
+  color: var(--primary, #0B3D91);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.3rem 0.5rem;
+}
+.nav-user:hover {
+  text-decoration: underline;
+}

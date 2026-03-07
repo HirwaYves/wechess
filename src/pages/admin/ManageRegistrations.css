@@ -1,0 +1,9 @@
+/* src/pages/admin/ManageRegistrations.css */
+.admin-manage-registrations {
+  padding: 20px;
+}
+
+.admin-manage-registrations h1 {
+  margin-bottom: 20px;
+  color: #0a4b8c;
+}

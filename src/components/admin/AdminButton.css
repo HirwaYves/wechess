@@ -1,0 +1,42 @@
+/* src/components/admin/AdminButton.css */
+.admin-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  font-size: 14px;
+}
+.admin-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.admin-btn-primary {
+  background: #0a4b8c;
+  color: white;
+}
+.admin-btn-primary:hover:not(:disabled) {
+  background: #083b6f;
+}
+.admin-btn-secondary {
+  background: #e9ecef;
+  color: #333;
+}
+.admin-btn-secondary:hover:not(:disabled) {
+  background: #dee2e6;
+}
+.admin-btn-danger {
+  background: #dc3545;
+  color: white;
+}
+.admin-btn-danger:hover:not(:disabled) {
+  background: #c82333;
+}
+.admin-btn-gold {
+  background: #c9a24b;
+  color: white;
+}
+.admin-btn-gold:hover:not(:disabled) {
+  background: #b88e3a;
+}

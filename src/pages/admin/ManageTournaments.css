@@ -1,0 +1,18 @@
+.admin-manage-tournaments {
+  padding: 20px;
+}
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.admin-modal-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.admin-modal-table th, .admin-modal-table td {
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}

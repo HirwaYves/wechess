@@ -1,0 +1,36 @@
+/* src/components/admin/AdminFormInput.css */
+.admin-form-group {
+  margin-bottom: 1rem;
+}
+.admin-label {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-weight: 500;
+  color: #333;
+}
+.admin-required {
+  color: #dc3545;
+  margin-left: 4px;
+}
+.admin-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.2s;
+}
+.admin-input:focus {
+  outline: none;
+  border-color: #0a4b8c;
+  box-shadow: 0 0 0 3px rgba(10,75,140,0.1);
+}
+.admin-input-error {
+  border-color: #dc3545;
+}
+.admin-error {
+  color: #dc3545;
+  font-size: 12px;
+  margin-top: 4px;
+  display: block;
+}

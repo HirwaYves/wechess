@@ -1,0 +1,32 @@
+.btn {
+  display: inline-block;
+  padding: 0.75rem 1.8rem;
+  border-radius: 40px;
+  font-weight: 500;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #0a357a;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(11, 61, 145, 0.2);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.btn-secondary:hover {
+  background-color: var(--primary);
+  color: white;
+}

@@ -1,0 +1,138 @@
+/* Copy the content from the Home.css I provided earlier */
+.hero {
+  background-color: var(--light-gray);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  min-height: 600px;
+}
+
+.hero-content {
+  padding-right: 2rem;
+}
+
+.hero-title {
+  font-size: 3.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 1.5rem;
+  color: var(--primary);
+}
+
+.gold-text {
+  color: var(--secondary);
+}
+
+.hero-subtitle {
+  font-size: 1.2rem;
+  color: var(--text-light);
+  margin-bottom: 2rem;
+  max-width: 500px;
+}
+
+.hero-bg {
+  position: relative;
+  height: 400px;
+  background: repeating-linear-gradient(45deg, rgba(212, 175, 55, 0.02) 0px, rgba(212, 175, 55, 0.02) 20px, transparent 20px, transparent 40px);
+}
+
+.hero-bg::after {
+  content: '♞';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 15rem;
+  color: rgba(11, 61, 145, 0.03);
+  pointer-events: none;
+  font-family: 'Inter', sans-serif;
+}
+
+.features {
+  background: white;
+}
+
+.section-title {
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 3rem;
+  color: var(--primary);
+  position: relative;
+}
+
+.section-title::after {
+  content: '';
+  display: block;
+  width: 80px;
+  height: 4px;
+  background: var(--secondary);
+  margin: 1rem auto 0;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+}
+
+.feature-card {
+  background: var(--light-gray);
+  padding: 2rem;
+  border-radius: 16px;
+  text-align: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 30px -10px rgba(11, 61, 145, 0.15);
+}
+
+.feature-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.feature-card h3 {
+  color: var(--primary);
+  margin-bottom: 0.5rem;
+  font-size: 1.5rem;
+}
+
+.feature-card p {
+  color: var(--text-light);
+}
+
+@media (max-width: 768px) {
+  .hero-container {
+    grid-template-columns: 1fr;
+    text-align: center;
+    min-height: auto;
+    padding: 4rem 1.5rem;
+  }
+  .hero-content {
+    padding-right: 0;
+  }
+  .hero-bg {
+    display: none;
+  }
+  .hero-title {
+    font-size: 2.5rem;
+  }
+}
+.policy-content {
+  max-width: 800px;
+  margin: 2rem auto;
+  background: var(--light-gray);
+  padding: 2.5rem;
+  border-radius: 20px;
+  line-height: 1.8;
+}
+.policy-content p {
+  margin-bottom: 1rem;
+}

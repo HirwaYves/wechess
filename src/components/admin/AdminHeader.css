@@ -1,0 +1,96 @@
+/* src/components/admin/AdminHeader.css */
+.admin-header {
+  height: 70px;
+  background: white;
+  border-bottom: 1px solid #e9ecef;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  position: sticky;
+  top: 0;
+  z-index: 900;
+}
+.admin-menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  margin-right: 16px;
+  color: #495057;
+}
+.admin-header-search {
+  flex: 1;
+  max-width: 400px;
+}
+.admin-header-search input {
+  width: 100%;
+  padding: 8px 16px;
+  border: 1px solid #ced4da;
+  border-radius: 30px;
+  font-size: 14px;
+}
+.admin-header-user {
+  position: relative;
+  margin-left: auto;
+}
+.admin-user-btn {
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 30px;
+}
+.admin-user-btn:hover {
+  background: #f8f9fa;
+}
+.admin-user-avatar {
+  font-size: 24px;
+}
+.admin-user-name {
+  font-weight: 500;
+}
+.admin-user-dropdown {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  min-width: 160px;
+  z-index: 100;
+}
+.admin-user-dropdown a,
+.admin-user-dropdown button {
+  display: block;
+  padding: 10px 16px;
+  text-decoration: none;
+  color: #333;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.admin-user-dropdown a:hover,
+.admin-user-dropdown button:hover {
+  background: #f8f9fa;
+}
+.admin-user-dropdown hr {
+  margin: 4px 0;
+  border: none;
+  border-top: 1px solid #e9ecef;
+}
+
+@media (max-width: 768px) {
+  .admin-menu-toggle {
+    display: block;
+  }
+  .admin-header-search {
+    display: none;
+  }
+}

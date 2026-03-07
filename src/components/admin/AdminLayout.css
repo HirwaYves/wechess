@@ -1,0 +1,22 @@
+/* src/components/admin/AdminLayout.css */
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #f8f9fa;
+}
+
+.admin-main {
+  flex: 1;
+  margin-left: 260px; /* width of sidebar */
+  transition: margin-left 0.3s ease;
+}
+
+.admin-content {
+  padding: 24px;
+}
+
+@media (max-width: 768px) {
+  .admin-main {
+    margin-left: 0;
+  }
+}
