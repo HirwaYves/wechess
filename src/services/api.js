@@ -1,5 +1,6 @@
 // src/services/api.js
-const API_BASE = import.meta.env.VITE_API_BASE || '/api';
+const BASE = import.meta.env.VITE_API_BASE || '';
+const API_BASE = BASE ? `${BASE}/api` : '/api';
 
 const getHeaders = () => {
   const token = localStorage.getItem('token');
@@ -22,11 +23,6 @@ export const api = {
   getTournaments: () => fetch(`${API_BASE}/tournaments`, { headers: getHeaders() }).then(handleResponse),
   createTournament: (data) => fetch(`${API_BASE}/tournaments`, {
     method: 'POST',
-    headers: getHeaders(),
-    body: JSON.stringify(data)
-  }).then(handleResponse),
-  updateTournament: (id, data) => fetch(`${API_BASE}/tournaments/${id}`, {
-    method: 'PUT',
     headers: getHeaders(),
     body: JSON.stringify(data)
   }).then(handleResponse),
@@ -60,26 +56,17 @@ export const api = {
     body: JSON.stringify(data)
   }).then(handleResponse),
 
-  // Participants for a tournament
+  // Participants
   getParticipants: (tournamentId) => fetch(`${API_BASE}/tournaments/${tournamentId}/participants`, { headers: getHeaders() }).then(handleResponse),
 
   // Leaderboard
   getLeaderboard: (seasonId) => fetch(`${API_BASE}/leaderboard${seasonId ? `?season_id=${seasonId}` : ''}`).then(handleResponse),
 
-  // Seasons (admin)
+  // Seasons
   getSeasons: () => fetch(`${API_BASE}/seasons`, { headers: getHeaders() }).then(handleResponse),
   createSeason: (data) => fetch(`${API_BASE}/seasons`, {
     method: 'POST',
     headers: getHeaders(),
     body: JSON.stringify(data)
-  }).then(handleResponse),
-  updateSeason: (id, data) => fetch(`${API_BASE}/seasons/${id}`, {
-    method: 'PUT',
-    headers: getHeaders(),
-    body: JSON.stringify(data)
-  }).then(handleResponse),
-  deleteSeason: (id) => fetch(`${API_BASE}/seasons/${id}`, {
-    method: 'DELETE',
-    headers: getHeaders()
   }).then(handleResponse),
 };
