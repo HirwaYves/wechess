@@ -28,17 +28,6 @@ const ManagePlayers = () => {
     }
   };
 
-  const toggleStatus = async (player) => {
-    try {
-      const result = await api.togglePlayerStatus(player.id);
-      // result contains { id, is_active } – use result.is_active for the message
-      addToast(`Player ${player.username} ${result.is_active ? 'enabled' : 'disabled'}`, 'success');
-      loadPlayers(); // refresh list
-    } catch (err) {
-      addToast(err.message, 'error');
-    }
-  };
-
   const resetPassword = async (player) => {
     try {
       const result = await api.resetPassword(player.id);
@@ -61,7 +50,6 @@ const ManagePlayers = () => {
 
   const actions = [
     { label: 'View', onClick: (row) => { setSelectedPlayer(row); setModalOpen(true); }, variant: 'view' },
-    { label: (row) => row.is_active ? 'Disable' : 'Enable', onClick: toggleStatus, variant: (row) => row.is_active ? 'reject' : 'confirm' },
     { label: 'Reset Password', onClick: resetPassword, variant: 'secondary' },
   ];
 
