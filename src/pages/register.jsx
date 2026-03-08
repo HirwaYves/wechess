@@ -22,13 +22,38 @@ const Register = () => {
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+    // Clear error when user starts typing
+    if (error) setError('');
   };
 
   const validateForm = () => {
+    // Check if any field is empty
+    for (const [key, value] of Object.entries(form)) {
+      if (!value.trim()) {
+        setError(`All fields are required. Please fill in ${key.replace(/([A-Z])/g, ' $1').toLowerCase()}`);
+        return false;
+      }
+    }
+    
+    // Check if emails match
     if (form.email !== form.confirmEmail) {
       setError('Email addresses do not match');
       return false;
     }
+    
+    // Basic email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(form.email)) {
+      setError('Please enter a valid email address');
+      return false;
+    }
+    
+    // Password minimum length (optional - you can adjust)
+    if (form.password.length < 3) {
+      setError('Password must be at least 3 characters long');
+      return false;
+    }
+    
     return true;
   };
 
@@ -66,9 +91,10 @@ const Register = () => {
     <div className="register-page">
       <div className="register-card">
         <h2>Join WEChess</h2>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} noValidate>
           <input 
             name="username" 
+            type="text"
             placeholder="Username *" 
             value={form.username} 
             onChange={handleChange} 
@@ -81,9 +107,11 @@ const Register = () => {
             value={form.password} 
             onChange={handleChange} 
             required 
+            minLength="3"
           />
           <input 
             name="firstName" 
+            type="text"
             placeholder="First Name *" 
             value={form.firstName} 
             onChange={handleChange} 
@@ -91,6 +119,7 @@ const Register = () => {
           />
           <input 
             name="lastName" 
+            type="text"
             placeholder="Last Name *" 
             value={form.lastName} 
             onChange={handleChange} 
@@ -114,6 +143,7 @@ const Register = () => {
           />
           <input 
             name="country" 
+            type="text"
             placeholder="Country *" 
             value={form.country} 
             onChange={handleChange} 
