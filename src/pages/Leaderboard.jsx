@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import './Leaderboard.css';
 
-const API = import.meta.env.VITE_API_BASE || '/api';
+const BASE = import.meta.env.VITE_API_BASE || '';
+const API = BASE ? `${BASE}/api` : '/api';
 
 const Leaderboard = () => {
   const [players, setPlayers] = useState([]);
@@ -10,8 +11,7 @@ const Leaderboard = () => {
   useEffect(() => {
     const fetchLeaderboard = async () => {
       try {
-        // Add /api prefix
-        const res = await fetch(`${API}/api/leaderboard`);
+        const res = await fetch(`${API}/leaderboard`);
         if (!res.ok) throw new Error('Failed to load leaderboard');
         const data = await res.json();
         setPlayers(data);
