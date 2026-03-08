@@ -2,8 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './profile.css';
 
-const API = import.meta.env.VITE_API_BASE || '/api';
-
 const Profile = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -17,7 +15,7 @@ const Profile = () => {
         return;
       }
       try {
-        const res = await fetch(`${API}/api/auth/me`, {
+        const res = await fetch('/api/auth/me', {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (!res.ok) throw new Error('Failed to fetch user');
