@@ -15,7 +15,7 @@ const Home = () => {
               Join the most welcoming chess community. Compete, learn, and connect with players worldwide.
             </p>
             <Button variant="primary" onClick={() => window.location.href='/register'}>
-              dcftvgybuhnjkmnhbgyvftd
+              Join WEChess
             </Button>
           </div>
           <div className="hero-bg"></div> {/* subtle knight illustration via CSS */}
