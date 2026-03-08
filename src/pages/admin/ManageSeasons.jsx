@@ -7,7 +7,8 @@ import AdminFormInput from '../../components/admin/AdminFormInput';
 import { useToast } from '../../components/admin/AdminToastContext';
 import './ManageSeasons.css';
 
-const API = import.meta.env.VITE_API_BASE || '/api';
+const BASE = import.meta.env.VITE_API_BASE || '';
+const API = BASE ? `${BASE}/api` : '/api';
 
 const ManageSeasons = () => {
   const [seasons, setSeasons] = useState([]);
