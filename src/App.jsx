@@ -24,7 +24,7 @@ import SubmitMatch from './pages/admin/SubmitMatch';
 import CreateTournament from './pages/admin/CreateTournament';
 import ManageSeasons from './pages/admin/ManageSeasons';
 
-import './App.css';
+import './app.css';
 
 function App() {
   return (
