@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './login.css';
 
+const API = import.meta.env.VITE_API_BASE || '/api';
+
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -15,11 +17,8 @@ const Login = () => {
     e.preventDefault();
     setError('');
 
-    // Use the environment variable for the API base URL
-    const API_BASE = import.meta.env.VITE_API_BASE || '/api';
-
     try {
-      const res = await fetch(`${API_BASE}/api/auth/login`, {
+      const res = await fetch(`${API}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
@@ -38,7 +37,6 @@ const Login = () => {
         throw new Error(data.error || `Login failed (${res.status})`);
       }
 
-      // Use context login
       login(data.user, data.token);
       navigate('/');
     } catch (err) {
