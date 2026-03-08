@@ -633,6 +633,28 @@ app.put('/api/admin/reset-password/:userId', requireAuth, requireAdmin, async (r
   }
 });
 
+
+// Admin: Reset user password (generates a random temporary password)
+app.put('/api/admin/reset-password/:userId', requireAuth, requireAdmin, async (req, res) => {
+  const userId = Number(req.params.userId);
+  try {
+    // Generate a random 8-character password (letters + numbers)
+    const tempPassword = Math.random().toString(36).slice(-8);
+    const salt = bcrypt.genSaltSync(10);
+    const hash = bcrypt.hashSync(tempPassword, salt);
+
+    await pool.query('UPDATE players SET password_hash = $1 WHERE id = $2', [hash, userId]);
+
+    res.json({ 
+      message: 'Password reset successful', 
+      tempPassword: tempPassword  // send back so admin can see it
+    });
+  } catch (err) {
+    console.error('PUT /api/admin/reset-password/:userId', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ------------- Start server -------------
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
