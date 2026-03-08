@@ -1,4 +1,4 @@
-// src/pages/login.jsx
+src/pages/login.jsx
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
