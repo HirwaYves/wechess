@@ -75,7 +75,6 @@
   cursor: not-allowed;
 }
 
-/* Mobile fine-tuning */
 @media (max-width: 480px) {
   .register-card {
     padding: 1.5rem;
