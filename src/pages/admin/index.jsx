@@ -1,69 +1,98 @@
-// src/services/api.js
-const BASE = import.meta.env.VITE_API_BASE || '';
-const API_BASE = BASE ? `${BASE}/api` : '/api';
+// src/pages/admin/index.jsx
+import React, { useEffect, useState } from 'react';
+import { api } from '../../services/api';
+import { useToast } from '../../components/admin/AdminToastContext';
+// import './admin.css';
 
-const getHeaders = () => {
-  const token = localStorage.getItem('token');
-  return {
-    'Content-Type': 'application/json',
-    ...(token && { Authorization: `Bearer ${token}` }),
+export default function AdminDashboard() {
+  const [players, setPlayers] = useState([]);
+  const [registrations, setRegistrations] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const { addToast } = useToast();
+
+  useEffect(() => {
+    Promise.all([
+      api.getPlayers(),
+      api.getPendingRegistrations()
+    ]).then(([playersData, regsData]) => {
+      setPlayers(playersData || []);
+      setRegistrations(regsData || []);
+    }).catch(err => {
+      addToast(err.message, 'error');
+    }).finally(() => setLoading(false));
+  }, []);
+
+  const confirmRegistration = async (regId) => {
+    try {
+      await api.confirmRegistration(regId);
+      // Refresh data
+      const regs = await api.getPendingRegistrations();
+      setRegistrations(regs || []);
+      const pls = await api.getPlayers();
+      setPlayers(pls || []);
+      addToast('Registration confirmed', 'success');
+    } catch (err) {
+      addToast(err.message, 'error');
+    }
   };
-};
 
-const handleResponse = async (res) => {
-  if (!res.ok) {
-    const error = await res.json().catch(() => ({}));
-    throw new Error(error.error || `Request failed with status ${res.status}`);
-  }
-  return res.json();
-};
+  const rejectRegistration = async (regId) => {
+    try {
+      await api.rejectRegistration(regId);
+      const regs = await api.getPendingRegistrations();
+      setRegistrations(regs || []);
+      addToast('Registration rejected', 'success');
+    } catch (err) {
+      addToast(err.message, 'error');
+    }
+  };
 
-export const api = {
-  // Tournaments
-  getTournaments: () => fetch(`${API_BASE}/tournaments`, { headers: getHeaders() }).then(handleResponse),
-  createTournament: (data) => fetch(`${API_BASE}/tournaments`, {
-    method: 'POST',
-    headers: getHeaders(),
-    body: JSON.stringify(data)
-  }).then(handleResponse),
-  updateTournament: (id, data) => fetch(`${API_BASE}/tournaments/${id}`, {
-    method: 'PUT',
-    headers: getHeaders(),
-    body: JSON.stringify(data)
-  }).then(handleResponse),
-  deleteTournament: (id) => fetch(`${API_BASE}/tournaments/${id}`, {
-    method: 'DELETE',
-    headers: getHeaders()
-  }).then(handleResponse),
+  if (loading) return <div className="container" style={{ padding: 20 }}>Loading admin…</div>;
 
-  // Players (admin)
-  getPlayers: () => fetch(`${API_BASE}/players`, { headers: getHeaders() }).then(handleResponse),
-  togglePlayerStatus: (id) => fetch(`${API_BASE}/players/${id}/toggle`, {
-    method: 'PUT',
-    headers: getHeaders()
-  }).then(handleResponse),
+  return (
+    <div className="container admin-page">
+      <h1>Admin Dashboard</h1>
 
-  // Registrations
-  getPendingRegistrations: () => fetch(`${API_BASE}/registrations?status=pending`, { headers: getHeaders() }).then(handleResponse),
-  confirmRegistration: (id) => fetch(`${API_BASE}/registrations/${id}/confirm`, {
-    method: 'PUT',
-    headers: getHeaders()
-  }).then(handleResponse),
-  rejectRegistration: (id) => fetch(`${API_BASE}/registrations/${id}/reject`, {
-    method: 'PUT',
-    headers: getHeaders()
-  }).then(handleResponse),
+      <section>
+        <h2>Pending Registrations</h2>
+        {registrations.length === 0 ? <p>No pending registrations.</p> : (
+          <table className="admin-table">
+            <thead><tr><th>#</th><th>Player</th><th>Tournament</th><th>When</th><th>Actions</th></tr></thead>
+            <tbody>
+              {registrations.map(r => (
+                <tr key={r.id}>
+                  <td>{r.id}</td>
+                  <td>{r.username} — {r.first_name} {r.last_name}</td>
+                  <td>{r.tournament_id}</td>
+                  <td>{new Date(r.registered_at).toLocaleString()}</td>
+                  <td>
+                    <button onClick={() => confirmRegistration(r.id)}>Confirm</button>
+                    <button onClick={() => rejectRegistration(r.id)} style={{ marginLeft: 8 }}>Reject</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </section>
 
-  // Matches
-  submitMatch: (data) => fetch(`${API_BASE}/matches`, {
-    method: 'POST',
-    headers: getHeaders(),
-    body: JSON.stringify(data)
-  }).then(handleResponse),
-
-  // Participants for a tournament
-  getParticipants: (tournamentId) => fetch(`${API_BASE}/tournaments/${tournamentId}/participants`, { headers: getHeaders() }).then(handleResponse),
-
-  // Leaderboard (public)
-  getLeaderboard: (seasonId) => fetch(`${API_BASE}/leaderboard${seasonId ? `?season_id=${seasonId}` : ''}`).then(handleResponse),
-};
+      <section style={{ marginTop: 32 }}>
+        <h2>All Players</h2>
+        <table className="admin-table">
+          <thead><tr><th>id</th><th>username</th><th>name</th><th>rating</th><th>country</th></tr></thead>
+          <tbody>
+            {players.map(p => (
+              <tr key={p.id}>
+                <td>{p.id}</td>
+                <td>{p.username}</td>
+                <td>{p.first_name} {p.last_name}</td>
+                <td>{p.current_rating}</td>
+                <td>{p.country}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
+    </div>
+  );
+}
