@@ -5,8 +5,6 @@ import { useToast } from '../../components/admin/AdminToastContext';
 import { api } from '../../services/api';
 import './ManagePlayers.css';
 
-const API_BASE = import.meta.env.VITE_API_BASE || '/api';
-
 const ManagePlayers = () => {
   const [players, setPlayers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -33,26 +31,18 @@ const ManagePlayers = () => {
   const toggleStatus = async (player) => {
     try {
       const result = await api.togglePlayerStatus(player.id);
+      // result should be { id, is_active }
       addToast(`Player ${player.username} ${result.is_active ? 'enabled' : 'disabled'}`, 'success');
-      loadPlayers();
+      loadPlayers(); // refresh list
     } catch (err) {
       addToast(err.message, 'error');
     }
   };
 
   const resetPassword = async (player) => {
-    const token = localStorage.getItem('token');
     try {
-      const res = await fetch(`${API_BASE}/admin/reset-password/${player.id}`, {
-        method: 'PUT',
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(`Reset failed: ${res.status} - ${errorText.substring(0, 100)}`);
-      }
-      const data = await res.json();
-      addToast(`New password for ${player.username}: ${data.tempPassword}`, 'success', 10000);
+      const result = await api.resetPassword(player.id);
+      addToast(`New password for ${player.username}: ${result.tempPassword}`, 'success', 10000);
     } catch (err) {
       addToast(err.message, 'error');
     }
@@ -69,11 +59,23 @@ const ManagePlayers = () => {
     { key: 'is_active', label: 'Active', render: (val) => val ? '✅' : '❌' },
   ];
 
+  // Option A: One toggle button (with corrected message)
   const actions = [
     { label: 'View', onClick: (row) => { setSelectedPlayer(row); setModalOpen(true); }, variant: 'view' },
     { label: (row) => row.is_active ? 'Disable' : 'Enable', onClick: toggleStatus, variant: (row) => row.is_active ? 'reject' : 'confirm' },
     { label: 'Reset Password', onClick: resetPassword, variant: 'secondary' },
   ];
+
+  // Option B: Separate Enable/Disable buttons (if you prefer)
+  // Uncomment below and comment the above actions if you want separate buttons
+  /*
+  const actions = [
+    { label: 'View', onClick: (row) => { setSelectedPlayer(row); setModalOpen(true); }, variant: 'view' },
+    { label: 'Enable', onClick: (row) => { if (!row.is_active) toggleStatus(row); }, variant: 'confirm', hide: (row) => row.is_active },
+    { label: 'Disable', onClick: (row) => { if (row.is_active) toggleStatus(row); }, variant: 'reject', hide: (row) => !row.is_active },
+    { label: 'Reset Password', onClick: resetPassword, variant: 'secondary' },
+  ];
+  */
 
   return (
     <div className="admin-manage-players">
