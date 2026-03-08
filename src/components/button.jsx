@@ -1,4 +1,4 @@
-import './Button.css'
+import './button.css'
 
 const Button = ({ children, onClick, type = 'button', variant = 'primary' }) => {
   return (
