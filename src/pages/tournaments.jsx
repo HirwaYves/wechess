@@ -21,7 +21,8 @@ const Tournaments = () => {
   useEffect(() => {
     const fetchTournaments = async () => {
       try {
-        const res = await fetch(`${API}/tournaments`);
+        // Add /api prefix
+        const res = await fetch(`${API}/api/tournaments`);
         if (!res.ok) throw new Error('Failed to load tournaments');
         const data = await res.json();
         setTournaments(data);
@@ -40,7 +41,8 @@ const Tournaments = () => {
     const fetchStandings = async () => {
       setLoadingStandings(true);
       try {
-        const res = await fetch(`${API}/tournaments/${selectedTournament}/standings`);
+        // Add /api prefix
+        const res = await fetch(`${API}/api/tournaments/${selectedTournament}/standings`);
         if (!res.ok) throw new Error('Failed to load standings');
         const data = await res.json();
         setStandings(data);
@@ -63,7 +65,8 @@ const Tournaments = () => {
     }
     setRegistering(true);
     try {
-      const res = await fetch(`${API}/registrations`, {
+      // Add /api prefix
+      const res = await fetch(`${API}/api/registrations`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
