@@ -655,6 +655,30 @@ app.put('/api/admin/reset-password/:userId', requireAuth, requireAdmin, async (r
   }
 });
 
+// ... after other routes ...
+
+// ---------- Admin: Toggle Player Status ----------
+// (This is the route you asked about)
+app.put('/api/players/:id/toggle', requireAuth, requireAdmin, async (req, res) => {
+  const playerId = Number(req.params.id);
+  try {
+    const { rows } = await pool.query('SELECT is_active FROM players WHERE id = $1', [playerId]);
+    if (!rows[0]) return res.status(404).json({ error: 'Player not found' });
+    const newStatus = !rows[0].is_active;
+    await pool.query('UPDATE players SET is_active = $1 WHERE id = $2', [newStatus, playerId]);
+    res.json({ id: playerId, is_active: newStatus });
+  } catch (err) {
+    console.error('PUT /api/players/:id/toggle', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ... other admin routes (seasons, matches, etc.) ...
+
+// ------------- Start server -------------
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
+
 // ------------- Start server -------------
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
