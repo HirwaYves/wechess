@@ -1,5 +1,5 @@
 import { FaEnvelope, FaWhatsapp, FaInstagram } from 'react-icons/fa'
-import './contact.css'
+//import './contact.css'
 
 const Contact = () => {
   return (
