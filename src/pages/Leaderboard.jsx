@@ -10,7 +10,8 @@ const Leaderboard = () => {
   useEffect(() => {
     const fetchLeaderboard = async () => {
       try {
-        const res = await fetch(`${API}/leaderboard`);
+        // Add /api prefix
+        const res = await fetch(`${API}/api/leaderboard`);
         if (!res.ok) throw new Error('Failed to load leaderboard');
         const data = await res.json();
         setPlayers(data);
