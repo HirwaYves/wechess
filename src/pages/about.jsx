@@ -1,4 +1,4 @@
-import './about.css'
+import './about.css';
 
 const About = () => {
   return (
@@ -41,7 +41,7 @@ const About = () => {
           <div className="about-card cta-card full-width">
             <h2>Partner with WEChess</h2>
             <p>Partner with WEChess to reach an engaged, growing community of active players and families. We offer branding on event posts, tournament pages, livestream overlays, and event merchandising.</p>
-            <p>Contact: <a href="mailto:sponsor@wechess.org">sponsor@wechess.org</a> or via WhatsApp</p>
+            <p>Contact: <strong>+250 734 982 692</strong> (WhatsApp) or via the group link below.</p>
             <a href="https://chat.whatsapp.com/KGfsgqgl4Rn3pcFVvUIMRt?mode=gi_t" target="_blank" rel="noopener noreferrer" className="whatsapp-link">Join WhatsApp Group</a>
           </div>
 
@@ -52,7 +52,7 @@ const About = () => {
         </div>
       </div>
     </section>
-  )
-}
+  );
+};
 
-export default About
+export default About;
