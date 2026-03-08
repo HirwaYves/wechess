@@ -5,7 +5,7 @@ import AdminButton from '../../components/admin/AdminButton';
 import AdminModal from '../../components/admin/AdminModal';
 import AdminFormInput from '../../components/admin/AdminFormInput';
 import { useToast } from '../../components/admin/AdminToastContext';
-import './ManageSeasons.css';
+//import './ManageSeasons.css';
 
 const BASE = import.meta.env.VITE_API_BASE || '';
 const API = BASE ? `${BASE}/api` : '/api';
