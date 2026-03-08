@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import './leaderboard.css';
+import './Leaderboard.css';
 
 const API = import.meta.env.VITE_API_BASE || '/api';
 
