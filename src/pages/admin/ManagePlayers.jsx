@@ -5,6 +5,8 @@ import { useToast } from '../../components/admin/AdminToastContext';
 import { api } from '../../services/api';
 import './ManagePlayers.css';
 
+const API_BASE = import.meta.env.VITE_API_BASE || '/api';
+
 const ManagePlayers = () => {
   const [players, setPlayers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -38,6 +40,21 @@ const ManagePlayers = () => {
     }
   };
 
+  const resetPassword = async (player) => {
+    const token = localStorage.getItem('token');
+    try {
+      const res = await fetch(`${API_BASE}/admin/reset-password/${player.id}`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Reset failed');
+      addToast(`New password for ${player.username}: ${data.tempPassword}`, 'success', 10000); // show longer
+    } catch (err) {
+      addToast(err.message, 'error');
+    }
+  };
+
   const columns = [
     { key: 'id', label: 'ID' },
     { key: 'username', label: 'Username' },
@@ -52,6 +69,7 @@ const ManagePlayers = () => {
   const actions = [
     { label: 'View', onClick: (row) => { setSelectedPlayer(row); setModalOpen(true); }, variant: 'view' },
     { label: (row) => row.is_active ? 'Disable' : 'Enable', onClick: toggleStatus, variant: (row) => row.is_active ? 'reject' : 'confirm' },
+    { label: 'Reset Password', onClick: resetPassword, variant: 'secondary' },
   ];
 
   return (
