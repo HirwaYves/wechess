@@ -32,8 +32,8 @@ const ManagePlayers = () => {
 
   const toggleStatus = async (player) => {
     try {
-      await api.togglePlayerStatus(player.id);
-      addToast(`Player ${player.username} ${player.is_active ? 'disabled' : 'enabled'}`, 'success');
+      const result = await api.togglePlayerStatus(player.id);
+      addToast(`Player ${player.username} ${result.is_active ? 'enabled' : 'disabled'}`, 'success');
       loadPlayers();
     } catch (err) {
       addToast(err.message, 'error');
@@ -47,9 +47,12 @@ const ManagePlayers = () => {
         method: 'PUT',
         headers: { Authorization: `Bearer ${token}` }
       });
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`Reset failed: ${res.status} - ${errorText.substring(0, 100)}`);
+      }
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Reset failed');
-      addToast(`New password for ${player.username}: ${data.tempPassword}`, 'success', 10000); // show longer
+      addToast(`New password for ${player.username}: ${data.tempPassword}`, 'success', 10000);
     } catch (err) {
       addToast(err.message, 'error');
     }
