@@ -65,4 +65,21 @@ export const api = {
 
   // Leaderboard
   getLeaderboard: (seasonId) => fetch(`${API_BASE}/leaderboard${seasonId ? `?season_id=${seasonId}` : ''}`).then(handleResponse),
+
+  // Seasons (admin)
+  getSeasons: () => fetch(`${API_BASE}/seasons`, { headers: getHeaders() }).then(handleResponse),
+  createSeason: (data) => fetch(`${API_BASE}/seasons`, {
+    method: 'POST',
+    headers: getHeaders(),
+    body: JSON.stringify(data)
+  }).then(handleResponse),
+  updateSeason: (id, data) => fetch(`${API_BASE}/seasons/${id}`, {
+    method: 'PUT',
+    headers: getHeaders(),
+    body: JSON.stringify(data)
+  }).then(handleResponse),
+  deleteSeason: (id) => fetch(`${API_BASE}/seasons/${id}`, {
+    method: 'DELETE',
+    headers: getHeaders()
+  }).then(handleResponse),
 };
