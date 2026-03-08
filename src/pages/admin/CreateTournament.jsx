@@ -7,7 +7,8 @@ import { useToast } from '../../components/admin/AdminToastContext';
 import { api } from '../../services/api';
 import './CreateTournament.css';
 
-const API = import.meta.env.VITE_API_BASE || '/api';
+const BASE = import.meta.env.VITE_API_BASE || '';
+const API = BASE ? `${BASE}/api` : '/api';
 
 const CreateTournament = () => {
   const [form, setForm] = useState({
