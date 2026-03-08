@@ -1,58 +1,177 @@
-import './about.css';
+/* src/pages/contact.css */
 
-const About = () => {
-  return (
-    <section className="about">
-      <div className="container">
-        <h1 className="page-title">About WEChess</h1>
-        
-        <div className="about-grid">
-          <div className="about-card">
-            <h2>Our Mission</h2>
-            <p>To bring people together through chess — we create welcoming, accessible tournaments and learning spaces that help players improve, compete, and connect across borders.</p>
-          </div>
+.contact {
+  padding: 4rem 0;
+  background: var(--light-gray, #f8f9fa);
+}
 
-          <div className="about-card">
-            <h2>Our Vision</h2>
-            <p>A global community where chess is a tool for growth, social connection, and opportunity — from casual weekend players to serious competitors.</p>
-          </div>
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
 
-          <div className="about-card full-width">
-            <h2>What We Do</h2>
-            <ul>
-              <li>Weekly online Blitz & Rapid tournaments.</li>
-              <li>Monthly flagship prize events and local over-the-board meetups.</li>
-              <li>Free coaching sessions and learning content from community coaches.</li>
-              <li>A clear code of conduct that puts respect and fair play first.</li>
-            </ul>
-          </div>
+.page-title {
+  margin-bottom: 3rem;
+  color: var(--primary, #0B3D91);
+  font-size: 2.5rem;
+  text-align: center;
+}
 
-          <div className="about-card highlight full-width">
-            <h2>Why WEChess is Different</h2>
-            <ul>
-              <li><strong>Community-first:</strong> we moderate and enforce zero-toxicity rules.</li>
-              <li><strong>Accessible:</strong> low/no entry fees early on; open to all levels.</li>
-              <li><strong>Hybrid model:</strong> we run online tournaments and support local meetups.</li>
-              <li><strong>Data-driven rankings:</strong> we publish standings and leaderboards to celebrate progress.</li>
-              <li><strong>Sponsor-friendly:</strong> transparent event reporting, clear brand placement, and engaged audience.</li>
-            </ul>
-          </div>
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: center;
+}
 
-          <div className="about-card cta-card full-width">
-            <h2>Partner with WEChess</h2>
-            <p>Partner with WEChess to reach an engaged, growing community of active players and families. We offer branding on event posts, tournament pages, livestream overlays, and event merchandising.</p>
-            <p>Contact: <strong>+250 734 982 692</strong> (WhatsApp) or via the group link below.</p>
-            <a href="https://chat.whatsapp.com/KGfsgqgl4Rn3pcFVvUIMRt?mode=gi_t" target="_blank" rel="noopener noreferrer" className="whatsapp-link">Join WhatsApp Group</a>
-          </div>
+.contact-info {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
 
-          <div className="about-card social-card full-width">
-            <h2>Follow Us</h2>
-            <a href="https://www.instagram.com/wechessofficial?igsh=eG4wbmR6eWZrM3Bo&utm_source=qr" target="_blank" rel="noopener noreferrer" className="instagram-link">Instagram</a>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-};
+.contact-info h2 {
+  color: var(--primary, #0B3D91);
+  margin-bottom: 1.5rem;
+  font-size: 1.8rem;
+  border-left: 5px solid var(--secondary, #D4AF37);
+  padding-left: 1rem;
+}
 
-export default About;
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.2rem;
+  font-size: 1.1rem;
+  color: var(--text-dark, #212529);
+  word-break: break-word;
+}
+
+.contact-icon {
+  color: var(--secondary, #D4AF37);
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.social-links {
+  display: flex;
+  gap: 1.2rem;
+  margin-top: 2rem;
+}
+
+.social-links a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--light-gray, #e9ecef);
+  color: var(--primary, #0B3D91);
+  font-size: 1.5rem;
+  transition: all 0.2s ease;
+}
+
+.social-links a:hover {
+  background: var(--primary, #0B3D91);
+  color: white;
+  transform: translateY(-3px);
+}
+
+.contact-note {
+  background: var(--primary, #0B3D91);
+  color: white;
+  padding: 2.5rem;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.contact-note h2 {
+  color: white;
+  margin-bottom: 1.5rem;
+  font-size: 1.8rem;
+  border-left: 5px solid var(--secondary, #D4AF37);
+  padding-left: 1rem;
+}
+
+.contact-note p {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  margin-bottom: 1rem;
+  opacity: 0.95;
+}
+
+.contact-note a {
+  color: var(--secondary, #D4AF37);
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.contact-note a:hover {
+  text-decoration: none;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .contact {
+    padding: 3rem 0;
+  }
+  .page-title {
+    font-size: 2rem;
+  }
+  .contact-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  .contact-info,
+  .contact-note {
+    padding: 1.8rem;
+  }
+  .contact-info h2,
+  .contact-note h2 {
+    font-size: 1.6rem;
+  }
+  .contact-item {
+    font-size: 1rem;
+  }
+  .social-links a {
+    width: 44px;
+    height: 44px;
+    font-size: 1.3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .contact {
+    padding: 2rem 0;
+  }
+  .page-title {
+    font-size: 1.8rem;
+  }
+  .contact-info,
+  .contact-note {
+    padding: 1.2rem;
+  }
+  .contact-info h2,
+  .contact-note h2 {
+    font-size: 1.4rem;
+  }
+  .contact-item {
+    font-size: 0.95rem;
+    gap: 0.8rem;
+  }
+  .contact-icon {
+    font-size: 1.3rem;
+  }
+  .social-links {
+    gap: 1rem;
+  }
+  .social-links a {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+  }
+}
