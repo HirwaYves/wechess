@@ -121,6 +121,9 @@ const Login = () => {
           Login with Google
         </button>
       </div>
+      <div className="forgot-link">
+  <NavLink to="/forgot-password">Forgot password?</NavLink>
+</div>
     </div>
   );
 };
