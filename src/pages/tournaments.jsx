@@ -21,7 +21,6 @@ const Tournaments = () => {
   useEffect(() => {
     const fetchTournaments = async () => {
       try {
-        // Add /api prefix
         const res = await fetch(`${API}/api/tournaments`);
         if (!res.ok) throw new Error('Failed to load tournaments');
         const data = await res.json();
@@ -41,7 +40,6 @@ const Tournaments = () => {
     const fetchStandings = async () => {
       setLoadingStandings(true);
       try {
-        // Add /api prefix
         const res = await fetch(`${API}/api/tournaments/${selectedTournament}/standings`);
         if (!res.ok) throw new Error('Failed to load standings');
         const data = await res.json();
@@ -65,7 +63,6 @@ const Tournaments = () => {
     }
     setRegistering(true);
     try {
-      // Add /api prefix
       const res = await fetch(`${API}/api/registrations`, {
         method: 'POST',
         headers: {
@@ -158,9 +155,8 @@ const Tournaments = () => {
                   <thead>
                     <tr>
                       <th>Rank</th>
-                      <th className="player-col">Player</th>
-                      <th className="username-col">Username</th>
-                      <th className="country-col">Country</th>
+                      <th>Username</th>
+                      <th>Country</th>
                       <th>Rating</th>
                       <th>Score</th>
                       <th>Wins</th>
@@ -175,9 +171,8 @@ const Tournaments = () => {
                         className={user?.id === player.player_id ? 'current-user-row' : ''}
                       >
                         <td>{player.rank}</td>
-                        <td className="player-col">{player.full_name || `${player.first_name} ${player.last_name}`}</td>
-                        <td className="username-col">{player.username}</td>
-                        <td className="country-col">{player.country || '—'}</td>
+                        <td>{player.username}</td>
+                        <td>{player.country || '—'}</td>
                         <td>{player.rating}</td>
                         <td>{player.score}</td>
                         <td>{player.wins}</td>
