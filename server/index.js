@@ -1,5 +1,4 @@
 // server/index.js (cleaned version - no duplicates)
-
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -175,6 +174,7 @@ app.post('/api/auth/login', async (req, res) => {
     res.status(500).json({ error: 'db error', details: err.message });
   }
 });
+
 /**
  * GET /api/auth/me – get current user from token
  */
@@ -191,6 +191,7 @@ app.get('/api/auth/me', requireAuth, async (req, res) => {
     res.status(500).json({ error: 'db error', details: err.message });
   }
 });
+
 // ---------- Registrations ----------
 
 async function tournamentIsFull(clientOrPool, tournamentId) {
@@ -527,8 +528,6 @@ app.put('/api/admin/reset-password/:userId', requireAuth, requireAdmin, async (r
   }
 });
 
-
-
 // ---------- Forgot Password ----------
 app.post('/api/auth/forgot-password', async (req, res) => {
   const { email } = req.body;
@@ -610,78 +609,6 @@ app.post('/api/auth/reset-password', async (req, res) => {
   }
 });
 
-// ---------- Forgot Password ----------
-app.post('/api/auth/forgot-password', async (req, res) => {
-  const { email } = req.body;
-  if (!email) return res.status(400).json({ error: 'Email required' });
-
-  try {
-    const { rows } = await pool.query('SELECT id, email FROM players WHERE email = $1', [email]);
-    if (rows.length === 0) {
-      return res.json({ message: 'If that email exists, a reset link has been sent.' });
-    }
-
-    const user = rows[0];
-    const token = crypto.randomBytes(32).toString('hex');
-    const expires = new Date(Date.now() + 3600000); // 1 hour
-
-    await pool.query(
-      'UPDATE players SET reset_token = $1, reset_token_expires = $2 WHERE id = $3',
-      [token, expires, user.id]
-    );
-
-    const { Resend } = require('resend');
-    const resend = new Resend(process.env.RESEND_API_KEY);
-
-    const resetLink = `https://wechess-community.vercel.app/reset-password?token=${token}`;
-
-    await resend.emails.send({
-      from: 'WEChess <noreply@wechess.com>', // You'll need to verify a domain in Resend
-      to: email,
-      subject: 'Reset your WEChess password',
-      html: `
-        <p>You requested a password reset.</p>
-        <p>Click <a href="${resetLink}">here</a> to reset your password. This link expires in 1 hour.</p>
-        <p>If you didn't request this, ignore this email.</p>
-      `,
-    });
-
-    res.json({ message: 'If that email exists, a reset link has been sent.' });
-  } catch (err) {
-    console.error('POST /api/auth/forgot-password', err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// ---------- Reset Password ----------
-app.post('/api/auth/reset-password', async (req, res) => {
-  const { token, newPassword } = req.body;
-  if (!token || !newPassword) return res.status(400).json({ error: 'Token and new password required' });
-
-  try {
-    const { rows } = await pool.query(
-      'SELECT id FROM players WHERE reset_token = $1 AND reset_token_expires > NOW()',
-      [token]
-    );
-    if (rows.length === 0) return res.status(400).json({ error: 'Invalid or expired token' });
-
-    const user = rows[0];
-    const salt = bcrypt.genSaltSync(10);
-    const hash = bcrypt.hashSync(newPassword, salt);
-
-    await pool.query(
-      'UPDATE players SET password_hash = $1, reset_token = NULL, reset_token_expires = NULL WHERE id = $2',
-      [hash, user.id]
-    );
-
-    res.json({ message: 'Password updated successfully' });
-  } catch (err) {
-    console.error('POST /api/auth/reset-password', err);
-    res.status(500).json({ error: err.message });
-  }
-});
 // ------------- Start server (ONLY ONE) -------------
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
-
-
