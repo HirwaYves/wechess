@@ -1,6 +1,4 @@
-// server/index.js  (Postgres-only, single file)
-// Replace your existing server/index.js with this file.
-
+// server/index.js (cleaned version - no duplicates)
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -200,11 +198,6 @@ async function tournamentIsFull(clientOrPool, tournamentId) {
   return cnt >= maxPlayers;
 }
 
-/**
- * Public: POST /api/registrations
- * body: { playerId, tournamentId, paymentRef }
- */
-
 // Admin-only: list pending registrations
 app.get('/api/registrations', requireAuth, requireAdmin, async (req, res) => {
   const status = req.query.status || 'pending';
@@ -298,23 +291,6 @@ app.post('/api/tournaments', requireAuth, requireAdmin, async (req, res) => {
   }
 });
 
-
-// ---------- Admin: Toggle Player Status ----------
-app.put('/api/players/:id/toggle', requireAuth, requireAdmin, async (req, res) => {
-  const playerId = Number(req.params.id);
-  try {
-    const { rows } = await pool.query('SELECT is_active FROM players WHERE id = $1', [playerId]);
-    if (!rows[0]) return res.status(404).json({ error: 'Player not found' });
-    const newStatus = !rows[0].is_active;
-    await pool.query('UPDATE players SET is_active = $1 WHERE id = $2', [newStatus, playerId]);
-    res.json({ id: playerId, is_active: newStatus });
-  } catch (err) {
-    console.error('PUT /api/players/:id/toggle', err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-
 // ---------- Admin: Toggle Player Status ----------
 app.put('/api/players/:id/toggle', requireAuth, requireAdmin, async (req, res) => {
   const playerId = Number(req.params.id);
@@ -355,6 +331,7 @@ app.post('/api/registrations', requireAuth, async (req, res) => {
     res.status(500).json({ error: 'db error', details: err.message });
   }
 });
+
 // Public: leaderboard (all players sorted by rating)
 app.get('/api/leaderboard', async (req, res) => {
   try {
@@ -367,86 +344,6 @@ app.get('/api/leaderboard', async (req, res) => {
   } catch (err) {
     console.error('GET /api/leaderboard', err);
     res.status(500).json({ error: err.message });
-  }
-});
-// ---------- Admin: Submit Match ----------
-app.post('/api/matches', requireAuth, requireAdmin, async (req, res) => {
-  const { tournament_id, white_player_id, black_player_id, result } = req.body;
-  if (!tournament_id || !white_player_id || !black_player_id || !result) {
-    return res.status(400).json({ error: 'Missing required fields' });
-  }
-  if (white_player_id === black_player_id) {
-    return res.status(400).json({ error: 'Players must be different' });
-  }
-  const client = await pool.connect();
-  try {
-    await client.query('BEGIN');
-
-    // Get tournament's season_id
-    const tourn = await client.query('SELECT season_id FROM tournaments WHERE id = $1', [tournament_id]);
-    if (!tourn.rows[0]) throw new Error('Tournament not found');
-    const season_id = tourn.rows[0].season_id;
-
-    // Get current ratings
-    const white = await client.query('SELECT current_rating FROM players WHERE id = $1', [white_player_id]);
-    const black = await client.query('SELECT current_rating FROM players WHERE id = $1', [black_player_id]);
-    if (!white.rows[0] || !black.rows[0]) throw new Error('Player not found');
-    const whiteRating = white.rows[0].current_rating;
-    const blackRating = black.rows[0].current_rating;
-
-    // Calculate new ratings using elo helper
-    const { updateElo } = require('./utils/elo');
-    const { newA: newWhite, newB: newBlack } = updateElo(whiteRating, blackRating, result);
-
-    // Insert match record
-    const matchSql = `
-      INSERT INTO matches
-        (tournament_id, season_id, white_player_id, black_player_id, result,
-         white_rating_before, black_rating_before, white_rating_after, black_rating_after)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-      RETURNING id
-    `;
-    const matchValues = [tournament_id, season_id, white_player_id, black_player_id, result,
-                         whiteRating, blackRating, newWhite, newBlack];
-    const matchRes = await client.query(matchSql, matchValues);
-    const matchId = matchRes.rows[0].id;
-
-    // Update players' current_rating
-    await client.query('UPDATE players SET current_rating = $1 WHERE id = $2', [newWhite, white_player_id]);
-    await client.query('UPDATE players SET current_rating = $1 WHERE id = $2', [newBlack, black_player_id]);
-
-    // Update tournament_participants stats
-    const updateParticipant = async (playerId, deltaWins, deltaLosses, deltaDraws, deltaScore) => {
-      await client.query(`
-        INSERT INTO tournament_participants (tournament_id, player_id, score, wins, draws, losses)
-        VALUES ($1, $2, $3, $4, $5, $6)
-        ON CONFLICT (tournament_id, player_id) DO UPDATE
-        SET score = tournament_participants.score + EXCLUDED.score,
-            wins = tournament_participants.wins + EXCLUDED.wins,
-            draws = tournament_participants.draws + EXCLUDED.draws,
-            losses = tournament_participants.losses + EXCLUDED.losses
-      `, [tournament_id, playerId, deltaScore, deltaWins, deltaDraws, deltaLosses]);
-    };
-
-    if (result === '1-0') {
-      await updateParticipant(white_player_id, 1, 0, 0, 1);
-      await updateParticipant(black_player_id, 0, 1, 0, 0);
-    } else if (result === '0-1') {
-      await updateParticipant(white_player_id, 0, 1, 0, 0);
-      await updateParticipant(black_player_id, 1, 0, 0, 1);
-    } else { // draw
-      await updateParticipant(white_player_id, 0, 0, 1, 0.5);
-      await updateParticipant(black_player_id, 0, 0, 1, 0.5);
-    }
-
-    await client.query('COMMIT');
-    res.json({ success: true, match_id: matchId, new_ratings: { white: newWhite, black: newBlack } });
-  } catch (err) {
-    await client.query('ROLLBACK');
-    console.error('POST /api/matches', err);
-    res.status(500).json({ error: err.message });
-  } finally {
-    client.release();
   }
 });
 
@@ -611,7 +508,6 @@ app.get('/api/tournaments/:id/standings', async (req, res) => {
   }
 });
 
-
 // Admin: Reset user password (generates a random temporary password)
 app.put('/api/admin/reset-password/:userId', requireAuth, requireAdmin, async (req, res) => {
   const userId = Number(req.params.userId);
@@ -627,31 +523,6 @@ app.put('/api/admin/reset-password/:userId', requireAuth, requireAdmin, async (r
   }
 });
 
-
-
-// ---------- Admin: Toggle Player Status ----------
-// (This is the route you asked about)
-app.put('/api/players/:id/toggle', requireAuth, requireAdmin, async (req, res) => {
-  const playerId = Number(req.params.id);
-  try {
-    const { rows } = await pool.query('SELECT is_active FROM players WHERE id = $1', [playerId]);
-    if (!rows[0]) return res.status(404).json({ error: 'Player not found' });
-    const newStatus = !rows[0].is_active;
-    await pool.query('UPDATE players SET is_active = $1 WHERE id = $2', [newStatus, playerId]);
-    res.json({ id: playerId, is_active: newStatus });
-  } catch (err) {
-    console.error('PUT /api/players/:id/toggle', err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// ... other admin routes (seasons, matches, etc.) ...
-
-// ------------- Start server -------------
+// ------------- Start server (ONLY ONE) -------------
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
-
-// ------------- Start server -------------
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
-
