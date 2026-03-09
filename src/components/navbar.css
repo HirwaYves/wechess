@@ -4,7 +4,7 @@
   position: sticky;
   top: 0;
   z-index: 100;
-  height: 70px; /* fixed height for consistency */
+  height: 70px;
   display: flex;
   align-items: center;
 }
@@ -17,7 +17,6 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  
 }
 
 .logo-img {
@@ -25,37 +24,7 @@
   width: auto;
 }
 
-/* Hamburger */
-.hamburger {
-  display: none;
-  flex-direction: column;
-  justify-content: space-around;
-  width: 22px;
-  height: 18px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-}
-
-.hamburger span {
-  width: 100%;
-  height: 3px;
-  background: var(--primary);
-  transition: all 0.3s ease;
-  border-radius: 10px;
-}
-
-.hamburger.open span:nth-child(1) {
-  transform: rotate(45deg) translate(5px, 5px);
-}
-.hamburger.open span:nth-child(2) {
-  opacity: 0;
-}
-.hamburger.open span:nth-child(3) {
-  transform: rotate(-45deg) translate(7px, -6px);
-}
-
+/* Desktop navigation */
 .nav-menu {
   display: flex;
   list-style: none;
@@ -67,6 +36,8 @@
   font-weight: 500;
   position: relative;
   padding-bottom: 4px;
+  color: var(--text-dark, #333);
+  text-decoration: none;
 }
 
 .nav-link::after {
@@ -76,7 +47,7 @@
   left: 0;
   width: 0;
   height: 2px;
-  background-color: var(--secondary);
+  background-color: var(--secondary, #D4AF37);
   transition: width 0.2s ease;
 }
 
@@ -86,21 +57,107 @@
 }
 
 .nav-link.active {
-  color: var(--primary);
+  color: var(--primary, #0B3D91);
   font-weight: 600;
+}
+
+/* Login button styling */
+.nav-link.btn-login {
+  background: var(--primary, #0B3D91);
+  color: white;
+  padding: 0.5rem 1.2rem;
+  border-radius: 30px;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+.nav-link.btn-login:hover {
+  background: #0a357a;
+  transform: translateY(-2px);
+}
+.nav-link.btn-login::after {
+  display: none; /* remove underline effect */
+}
+
+/* Logged-in user area */
+.nav-logged {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.nav-user {
+  background: none;
+  border: none;
+  color: var(--primary, #0B3D91);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.3rem 0.5rem;
+  font-size: 1rem;
+}
+.nav-user:hover {
+  text-decoration: underline;
+}
+.nav-logout {
+  background: none;
+  border: 2px solid var(--secondary, #D4AF37);
+  color: var(--secondary, #D4AF37);
+  padding: 0.3rem 1rem;
+  border-radius: 30px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.nav-logout:hover {
+  background: var(--secondary, #D4AF37);
+  color: white;
+}
+
+/* Hamburger icon – hidden on desktop */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 30px;
+  height: 25px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+.hamburger span {
+  width: 100%;
+  height: 3px;
+  background: var(--primary, #0B3D91);
+  transition: all 0.3s ease;
+  border-radius: 10px;
+}
+.hamburger.open span:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+.hamburger.open span:nth-child(2) {
+  opacity: 0;
+}
+.hamburger.open span:nth-child(3) {
+  transform: rotate(-45deg) translate(7px, -6px);
+}
+
+/* Primary mobile links – visible even when hamburger closed */
+.primary-mobile-links {
+  display: none; /* hidden on desktop */
 }
 
 /* Mobile styles */
 @media (max-width: 768px) {
   .logo-img {
-  height: 60px;
-  width: auto;
-}
+    height: 60px;
+  }
 
+  /* Show hamburger */
   .hamburger {
     display: flex;
   }
 
+  /* Hide full nav-menu on mobile by default */
   .nav-menu {
     position: fixed;
     top: 70px;
@@ -113,13 +170,37 @@
     transition: left 0.3s ease;
     gap: 1.5rem;
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    z-index: 99;
   }
-
   .nav-menu.active {
     left: 0;
   }
 
-  .nav-link {
-    font-size: 1.2rem;
+  /* Primary links (Home, Tournaments, Leaderboard) always visible */
+  .primary-mobile-links {
+    display: flex;
+    gap: 1rem;
+    margin-right: auto;
+    margin-left: 1rem;
+  }
+  .primary-mobile-links .nav-link {
+    font-size: 1rem;
+    padding: 0.3rem 0.5rem;
+    white-space: nowrap;
+  }
+
+  /* Adjust navbar container to accommodate primary links */
+  .navbar-container {
+    flex-wrap: nowrap;
+  }
+
+  /* Move login/logout inside hamburger menu, not visible outside */
+  .nav-right {
+    width: 100%;
+    text-align: center;
+    margin-top: 1rem;
+  }
+  .nav-logged {
+    justify-content: center;
   }
 }
