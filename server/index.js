@@ -553,28 +553,35 @@ app.post('/api/auth/forgot-password', async (req, res) => {
       [token, expires, user.id]
     );
 
-  // Send email using Resend
-try {
-  const { Resend } = require('resend');
-  const resend = new Resend(process.env.RESEND_API_KEY);
+    // Send email using Resend (with test domain)
+    try {
+      const { Resend } = require('resend');
+      const resend = new Resend(process.env.RESEND_API_KEY);
 
-  const resetLink = `https://wechess-community.vercel.app/reset-password?token=${token}`;
+      const resetLink = `https://wechess-community.vercel.app/reset-password?token=${token}`;
 
-  const emailResult = await resend.emails.send({
-    from: 'WEChess <onboarding@resend.dev>', // temporary test address
-    to: email,
-    subject: 'Reset your WEChess password',
-    html: `
-      <p>You requested a password reset.</p>
-      <p>Click <a href="${resetLink}">here</a> to reset your password. This link expires in 1 hour.</p>
-      <p>If you didn't request this, ignore this email.</p>
-    `,
-  });
-  console.log('Resend success:', emailResult);
-} catch (emailErr) {
-  console.error('Resend error details:', emailErr);
-  // Still return success to the user (don't reveal failure)
-}
+      const emailResult = await resend.emails.send({
+        from: 'WEChess <onboarding@resend.dev>', // Test address – replace with verified domain later
+        to: email,
+        subject: 'Reset your WEChess password',
+        html: `
+          <p>You requested a password reset.</p>
+          <p>Click <a href="${resetLink}">here</a> to reset your password. This link expires in 1 hour.</p>
+          <p>If you didn't request this, ignore this email.</p>
+        `,
+      });
+      console.log('Resend success:', emailResult);
+    } catch (emailErr) {
+      console.error('Resend error details:', emailErr);
+      // Still return success to the user
+    }
+
+    res.json({ message: 'If that email exists, a reset link has been sent.' });
+  } catch (err) {
+    console.error('POST /api/auth/forgot-password', err);
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // ---------- Reset Password ----------
 app.post('/api/auth/reset-password', async (req, res) => {
