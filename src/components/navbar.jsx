@@ -15,16 +15,12 @@ const Navbar = () => {
     navigate('/');
   };
 
-  // Primary links always visible on mobile (and desktop too)
-  const primaryNavItems = [
+  // All navigation items (full list)
+  const allNavItems = [
     { path: '/', label: 'Home' },
+    { path: '/about', label: 'About' },
     { path: '/tournaments', label: 'Tournaments' },
     { path: '/leaderboard', label: 'Leaderboard' },
-  ];
-
-  // Secondary links go inside hamburger menu
-  const secondaryNavItems = [
-    { path: '/about', label: 'About' },
     ...(!user ? [{ path: '/register', label: 'Register' }] : []),
     { path: '/contact', label: 'Contact' },
   ];
@@ -36,18 +32,29 @@ const Navbar = () => {
           <img src={logo} alt="WEChess" className="logo-img" />
         </NavLink>
 
-        {/* Primary links – visible on all devices */}
+        {/* Primary links – visible on mobile only */}
         <div className="primary-mobile-links">
-          {primaryNavItems.map(item => (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-              onClick={() => setMenuOpen(false)}
-            >
-              {item.label}
-            </NavLink>
-          ))}
+          <NavLink
+            to="/"
+            className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
+            onClick={() => setMenuOpen(false)}
+          >
+            Home
+          </NavLink>
+          <NavLink
+            to="/tournaments"
+            className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
+            onClick={() => setMenuOpen(false)}
+          >
+            Tournaments
+          </NavLink>
+          <NavLink
+            to="/leaderboard"
+            className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
+            onClick={() => setMenuOpen(false)}
+          >
+            Leaderboard
+          </NavLink>
         </div>
 
         <button
@@ -58,9 +65,9 @@ const Navbar = () => {
           <span></span><span></span><span></span>
         </button>
 
+        {/* Full navigation menu (desktop always visible, mobile toggled) */}
         <ul className={`nav-menu ${menuOpen ? 'active' : ''}`}>
-          {/* Secondary nav items */}
-          {secondaryNavItems.map(item => (
+          {allNavItems.map(item => (
             <li key={item.path} className="nav-item">
               <NavLink
                 to={item.path}
@@ -84,7 +91,7 @@ const Navbar = () => {
             </li>
           )}
 
-          {/* Login/Logout section */}
+          {/* Login/Logout */}
           <li className="nav-item nav-right">
             {!user ? (
               <NavLink
