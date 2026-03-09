@@ -69,16 +69,10 @@ export const api = {
     headers: getHeaders(),
     body: JSON.stringify(data)
   }).then(handleResponse),
-};
 
-// Inside api.js, after other methods
-resetPassword: (userId) => {
-  const token = localStorage.getItem('token');
-  return fetch(`${API_BASE}/admin/reset-password/${userId}`, {
+  // Reset password (admin)
+  resetPassword: (userId) => fetch(`${API_BASE}/admin/reset-password/${userId}`, {
     method: 'PUT',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    }
-  }).then(handleResponse);
-},
+    headers: getHeaders()
+  }).then(handleResponse)
+};
