@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { FaHome, FaTrophy, FaChartLine, FaInfoCircle, FaEnvelope, FaUser, FaSignInAlt, FaSignOutAlt, FaBars, FaTimes } from 'react-icons/fa';
 import logo from '../assets/WEchess logo with knight silhouette.png';
 import './navbar.css';
 
@@ -13,16 +14,24 @@ const Navbar = () => {
   const handleLogout = () => {
     logout();
     navigate('/');
+    setMenuOpen(false);
   };
 
-  // All navigation items (full list)
+  // All navigation items
   const allNavItems = [
-    { path: '/', label: 'Home' },
-    { path: '/about', label: 'About' },
-    { path: '/tournaments', label: 'Tournaments' },
-    { path: '/leaderboard', label: 'Leaderboard' },
-    ...(!user ? [{ path: '/register', label: 'Register' }] : []),
-    { path: '/contact', label: 'Contact' },
+    { path: '/', label: 'Home', icon: <FaHome /> },
+    { path: '/about', label: 'About', icon: <FaInfoCircle /> },
+    { path: '/tournaments', label: 'Tournaments', icon: <FaTrophy /> },
+    { path: '/leaderboard', label: 'Leaderboard', icon: <FaChartLine /> },
+    ...(!user ? [{ path: '/register', label: 'Register', icon: <FaUser /> }] : []),
+    { path: '/contact', label: 'Contact', icon: <FaEnvelope /> },
+  ];
+
+  // Primary icons for mobile (always visible)
+  const primaryMobileItems = [
+    { path: '/', icon: <FaHome />, label: 'Home' },
+    { path: '/tournaments', icon: <FaTrophy />, label: 'Tournaments' },
+    { path: '/leaderboard', icon: <FaChartLine />, label: 'Leaderboard' },
   ];
 
   return (
@@ -32,87 +41,137 @@ const Navbar = () => {
           <img src={logo} alt="WEChess" className="logo-img" />
         </NavLink>
 
-        {/* Primary links – visible on mobile only */}
-        <div className="primary-mobile-links">
-          <NavLink
-            to="/"
-            className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-            onClick={() => setMenuOpen(false)}
-          >
-            Home
-          </NavLink>
-          <NavLink
-            to="/tournaments"
-            className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-            onClick={() => setMenuOpen(false)}
-          >
-            Tournaments
-          </NavLink>
-          <NavLink
-            to="/leaderboard"
-            className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-            onClick={() => setMenuOpen(false)}
-          >
-            Leaderboard
-          </NavLink>
-        </div>
-
-        <button
-          className={`hamburger ${menuOpen ? 'open' : ''}`}
-          onClick={() => setMenuOpen(!menuOpen)}
-          aria-label="Toggle menu"
-        >
-          <span></span><span></span><span></span>
-        </button>
-
-        {/* Full navigation menu (desktop always visible, mobile toggled) */}
-        <ul className={`nav-menu ${menuOpen ? 'active' : ''}`}>
+        {/* Desktop Navigation (full text) */}
+        <ul className="nav-menu-desktop">
           {allNavItems.map(item => (
             <li key={item.path} className="nav-item">
               <NavLink
                 to={item.path}
                 className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-                onClick={() => setMenuOpen(false)}
               >
                 {item.label}
               </NavLink>
             </li>
           ))}
-
           {user?.isAdmin && (
             <li className="nav-item">
               <NavLink
                 to="/admin"
                 className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-                onClick={() => setMenuOpen(false)}
               >
                 Admin
               </NavLink>
             </li>
           )}
-
-          {/* Login/Logout */}
           <li className="nav-item nav-right">
             {!user ? (
               <NavLink
                 to="/login"
                 className={({ isActive }) => isActive ? 'nav-link btn-login active' : 'nav-link btn-login'}
-                onClick={() => setMenuOpen(false)}
               >
                 Login
               </NavLink>
             ) : (
               <div className="nav-logged">
                 <button className="nav-user" onClick={() => navigate('/profile')}>
-                  {user.username}
+                  <FaUser /> {user.username}
                 </button>
                 <button className="nav-logout" onClick={handleLogout}>
-                  Logout
+                  <FaSignOutAlt /> Logout
                 </button>
               </div>
             )}
           </li>
         </ul>
+
+        {/* Mobile Navigation */}
+        <div className="nav-mobile">
+          {/* Primary icons */}
+          <div className="mobile-primary-icons">
+            {primaryMobileItems.map(item => (
+              <NavLink
+                key={item.path}
+                to={item.path}
+                className={({ isActive }) => 'mobile-icon' + (isActive ? ' active' : '')}
+                onClick={() => setMenuOpen(false)}
+                title={item.label}
+              >
+                {item.icon}
+              </NavLink>
+            ))}
+          </div>
+
+          {/* Hamburger button */}
+          <button
+            className={`hamburger ${menuOpen ? 'open' : ''}`}
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label="Toggle menu"
+          >
+            {menuOpen ? <FaTimes /> : <FaBars />}
+          </button>
+
+          {/* Mobile drawer */}
+          <div className={`mobile-drawer ${menuOpen ? 'open' : ''}`}>
+            <ul className="mobile-menu">
+              {allNavItems.map(item => (
+                <li key={item.path}>
+                  <NavLink
+                    to={item.path}
+                    className={({ isActive }) => 'mobile-link' + (isActive ? ' active' : '')}
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    <span className="mobile-link-icon">{item.icon}</span>
+                    {item.label}
+                  </NavLink>
+                </li>
+              ))}
+              {user?.isAdmin && (
+                <li>
+                  <NavLink
+                    to="/admin"
+                    className={({ isActive }) => 'mobile-link' + (isActive ? ' active' : '')}
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    <span className="mobile-link-icon"><FaUser /></span>
+                    Admin
+                  </NavLink>
+                </li>
+              )}
+              <li className="mobile-divider"></li>
+              {!user ? (
+                <li>
+                  <NavLink
+                    to="/login"
+                    className="mobile-link"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    <span className="mobile-link-icon"><FaSignInAlt /></span>
+                    Login
+                  </NavLink>
+                </li>
+              ) : (
+                <>
+                  <li>
+                    <NavLink
+                      to="/profile"
+                      className="mobile-link"
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      <span className="mobile-link-icon"><FaUser /></span>
+                      Profile ({user.username})
+                    </NavLink>
+                  </li>
+                  <li>
+                    <button className="mobile-logout" onClick={handleLogout}>
+                      <span className="mobile-link-icon"><FaSignOutAlt /></span>
+                      Logout
+                    </button>
+                  </li>
+                </>
+              )}
+            </ul>
+          </div>
+        </div>
       </div>
     </nav>
   );
