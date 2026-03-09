@@ -124,3 +124,14 @@
   width: 20px;
   height: 20px;
 }
+.forgot-link {
+  text-align: center;
+  margin-top: 1rem;
+}
+.forgot-link a {
+  color: var(--primary, #0B3D91);
+  text-decoration: none;
+}
+.forgot-link a:hover {
+  text-decoration: underline;
+}
