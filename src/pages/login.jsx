@@ -23,13 +23,17 @@ const Login = () => {
         body: JSON.stringify({ login, password })
       });
 
+      // Log the response for debugging
+      console.log('Response status:', res.status);
+      const responseText = await res.text();
+      console.log('Response text:', responseText);
+
       let data;
       const contentType = res.headers.get('content-type');
       if (contentType && contentType.includes('application/json')) {
-        data = await res.json();
+        data = JSON.parse(responseText);
       } else {
-        const text = await res.text();
-        throw new Error(`Server returned ${res.status}: ${text.substring(0, 100)}`);
+        throw new Error(`Server returned ${res.status}: ${responseText.substring(0, 100)}`);
       }
 
       if (!res.ok) {
