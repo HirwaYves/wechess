@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { NavLink } from 'react-router-dom';  // make sure NavLink is imported
 import './login.css';
 
 const API = import.meta.env.VITE_API_BASE || '/api';
@@ -17,7 +18,6 @@ const Login = () => {
     e.preventDefault();
     setError('');
 
-    // Client-side validation
     if (!login.trim()) {
       setError('Please enter your username or email');
       return;
@@ -120,8 +120,12 @@ const Login = () => {
           </svg>
           Login with Google
         </button>
+
+        {/* Forgot password link */}
+        <div className="forgot-link">
+          <NavLink to="/forgot-password">Forgot password?</NavLink>
+        </div>
       </div>
-      
     </div>
   );
 };
