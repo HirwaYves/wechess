@@ -135,13 +135,17 @@ app.post('/api/auth/register', async (req, res) => {
 
 /**
  * POST /api/auth/login
- * body: { username, password }
+ * body: { login, password }  // login can be username or email
  */
 app.post('/api/auth/login', async (req, res) => {
-  const { username, password } = req.body;
-  if (!username || !password) return res.status(400).json({ error: 'username and password required' });
+  const { login, password } = req.body;
+  if (!login || !password) return res.status(400).json({ error: 'login and password required' });
+
   try {
-    const { rows } = await pool.query('SELECT id, username, password_hash, first_name, last_name, email, country, is_admin, is_active, current_rating FROM players WHERE username = $1', [username]);
+    const { rows } = await pool.query(
+      'SELECT id, username, password_hash, first_name, last_name, email, country, is_admin, is_active, current_rating FROM players WHERE username = $1 OR email = $1',
+      [login]
+    );
     const user = rows[0];
     if (!user) return res.status(401).json({ error: 'invalid credentials' });
     if (!user.is_active) return res.status(403).json({ error: 'account disabled' });
@@ -186,7 +190,6 @@ app.get('/api/auth/me', requireAuth, async (req, res) => {
     res.status(500).json({ error: 'db error', details: err.message });
   }
 });
-
 // ---------- Registrations ----------
 
 async function tournamentIsFull(clientOrPool, tournamentId) {
