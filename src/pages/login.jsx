@@ -2,16 +2,15 @@ import './login.css';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import './login.css';
 
 const API = import.meta.env.VITE_API_BASE || '/api';
 
 const Login = () => {
-  const [username, setUsername] = useState('');
+  const [login, setLogin] = useState(''); // renamed from username to login
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login: authLogin } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,7 +20,7 @@ const Login = () => {
       const res = await fetch(`${API}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
+        body: JSON.stringify({ login, password }) // sending 'login' field
       });
 
       let data;
@@ -37,7 +36,7 @@ const Login = () => {
         throw new Error(data.error || `Login failed (${res.status})`);
       }
 
-      login(data.user, data.token);
+      authLogin(data.user, data.token);
       navigate('/');
     } catch (err) {
       console.error('Login error:', err);
@@ -52,10 +51,10 @@ const Login = () => {
         <form onSubmit={handleSubmit} className="login-form">
           <input
             type="text"
-            placeholder="Username"
+            placeholder="Username or Email"
             className="inp"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            value={login}
+            onChange={(e) => setLogin(e.target.value)}
             required
           />
           <input
