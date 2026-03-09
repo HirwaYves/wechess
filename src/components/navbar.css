@@ -110,3 +110,18 @@
     background: #ffeeee;
   }
 }
+.mobile-profile-icon {
+  background: none;
+  border: none;
+  color: var(--primary, #0B3D91);
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0.2rem;
+  margin-right: 0.2rem;
+}
+.mobile-profile-icon:hover {
+  opacity: 0.8;
+}
