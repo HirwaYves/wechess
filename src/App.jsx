@@ -24,6 +24,11 @@ import SubmitMatch from './pages/admin/SubmitMatch';
 import CreateTournament from './pages/admin/CreateTournament';
 import ManageSeasons from './pages/admin/ManageSeasons';
 
+
+//password reccovery
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
+
 import './app.css';
 
 function App() {
@@ -42,6 +47,8 @@ function App() {
           <Route path="/terms" element={<Terms />} />
           <Route path="/login" element={<Login />} />
           <Route path="/leaderboard" element={<Leaderboard />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
 
           {/* User profile (protected) */}
           <Route
