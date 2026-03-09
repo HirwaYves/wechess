@@ -143,7 +143,7 @@ app.post('/api/auth/login', async (req, res) => {
 
   try {
     const { rows } = await pool.query(
-      'SELECT id, username, password_hash, first_name, last_name, email, country, is_admin, is_active, current_rating FROM players WHERE username = $1 OR email = $1',
+      'SELECT id, username, password_hash, first_name, last_name, email, country, is_admin, is_active, current_rating FROM players WHERE username ILIKE $1 OR email ILIKE $1',
       [login]
     );
     const user = rows[0];
@@ -173,7 +173,6 @@ app.post('/api/auth/login', async (req, res) => {
     res.status(500).json({ error: 'db error', details: err.message });
   }
 });
-
 /**
  * GET /api/auth/me – get current user from token
  */
