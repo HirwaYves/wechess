@@ -24,7 +24,7 @@
   width: auto;
 }
 
-/* Desktop navigation */
+/* Full desktop menu */
 .nav-menu {
   display: flex;
   list-style: none;
@@ -61,7 +61,7 @@
   font-weight: 600;
 }
 
-/* Login button styling */
+/* Login button */
 .nav-link.btn-login {
   background: var(--primary, #0B3D91);
   color: white;
@@ -75,7 +75,7 @@
   transform: translateY(-2px);
 }
 .nav-link.btn-login::after {
-  display: none; /* remove underline effect */
+  display: none;
 }
 
 /* Logged-in user area */
@@ -112,7 +112,7 @@
   color: white;
 }
 
-/* Hamburger icon – hidden on desktop */
+/* Hamburger – hidden on desktop */
 .hamburger {
   display: none;
   flex-direction: column;
@@ -141,9 +141,9 @@
   transform: rotate(-45deg) translate(7px, -6px);
 }
 
-/* Primary mobile links – visible even when hamburger closed */
+/* Primary mobile links – hidden on desktop, visible on mobile */
 .primary-mobile-links {
-  display: none; /* hidden on desktop */
+  display: none;
 }
 
 /* Mobile styles */
@@ -157,7 +157,7 @@
     display: flex;
   }
 
-  /* Hide full nav-menu on mobile by default */
+  /* Hide full menu by default */
   .nav-menu {
     position: fixed;
     top: 70px;
@@ -176,29 +176,28 @@
     left: 0;
   }
 
-  /* Primary links (Home, Tournaments, Leaderboard) always visible */
+  /* Primary links always visible */
   .primary-mobile-links {
     display: flex;
-    gap: 1rem;
+    gap: 0.8rem;
     margin-right: auto;
-    margin-left: 1rem;
+    margin-left: 0.5rem;
   }
   .primary-mobile-links .nav-link {
-    font-size: 1rem;
+    font-size: 0.9rem;
     padding: 0.3rem 0.5rem;
     white-space: nowrap;
   }
 
-  /* Adjust navbar container to accommodate primary links */
+  /* Adjust spacing */
   .navbar-container {
     flex-wrap: nowrap;
   }
 
-  /* Move login/logout inside hamburger menu, not visible outside */
+  /* Center login/logout in hamburger */
   .nav-right {
     width: 100%;
     text-align: center;
-    margin-top: 1rem;
   }
   .nav-logged {
     justify-content: center;
