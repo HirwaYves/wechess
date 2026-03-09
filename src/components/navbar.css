@@ -1,3 +1,4 @@
+/* src/components/navbar.css */
 .navbar {
   background-color: white;
   box-shadow: 0 2px 10px rgba(0,0,0,0.05);
@@ -24,8 +25,8 @@
   width: auto;
 }
 
-/* Full desktop menu */
-.nav-menu {
+/* Desktop menu */
+.nav-menu-desktop {
   display: flex;
   list-style: none;
   gap: 2rem;
@@ -92,6 +93,9 @@
   cursor: pointer;
   padding: 0.3rem 0.5rem;
   font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
 }
 .nav-user:hover {
   text-decoration: underline;
@@ -106,100 +110,131 @@
   font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
 }
 .nav-logout:hover {
   background: var(--secondary, #D4AF37);
   color: white;
 }
 
-/* Hamburger – hidden on desktop */
-.hamburger {
-  display: none;
-  flex-direction: column;
-  justify-content: space-around;
-  width: 30px;
-  height: 25px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-}
-.hamburger span {
-  width: 100%;
-  height: 3px;
-  background: var(--primary, #0B3D91);
-  transition: all 0.3s ease;
-  border-radius: 10px;
-}
-.hamburger.open span:nth-child(1) {
-  transform: rotate(45deg) translate(5px, 5px);
-}
-.hamburger.open span:nth-child(2) {
-  opacity: 0;
-}
-.hamburger.open span:nth-child(3) {
-  transform: rotate(-45deg) translate(7px, -6px);
-}
-
-/* Primary mobile links – hidden on desktop, visible on mobile */
-.primary-mobile-links {
+/* Hide mobile elements on desktop */
+.nav-mobile {
   display: none;
 }
 
 /* Mobile styles */
 @media (max-width: 768px) {
+  .nav-menu-desktop {
+    display: none;
+  }
+
+  .nav-mobile {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
   .logo-img {
     height: 60px;
   }
 
-  /* Show hamburger */
-  .hamburger {
+  .mobile-primary-icons {
     display: flex;
+    gap: 0.8rem;
+    margin-right: 0.5rem;
+  }
+  .mobile-icon {
+    color: var(--primary, #0B3D91);
+    font-size: 1.3rem;
+    padding: 0.3rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background 0.2s;
+  }
+  .mobile-icon.active {
+    background: var(--primary, #0B3D91);
+    color: white;
   }
 
-  /* Hide full menu by default */
-  .nav-menu {
+  .hamburger {
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    color: var(--primary, #0B3D91);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding: 0;
+  }
+
+  .mobile-drawer {
     position: fixed;
     top: 70px;
     left: -100%;
     width: 100%;
     height: calc(100vh - 70px);
     background: white;
-    flex-direction: column;
-    padding: 2rem;
     transition: left 0.3s ease;
-    gap: 1.5rem;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     z-index: 99;
+    overflow-y: auto;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
   }
-  .nav-menu.active {
+  .mobile-drawer.open {
     left: 0;
   }
 
-  /* Primary links always visible */
-  .primary-mobile-links {
+  .mobile-menu {
+    list-style: none;
+    padding: 2rem;
+    margin: 0;
+  }
+  .mobile-menu li {
+    margin-bottom: 1rem;
+  }
+  .mobile-link {
     display: flex;
-    gap: 0.8rem;
-    margin-right: auto;
-    margin-left: 0.5rem;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.8rem;
+    color: var(--text-dark, #333);
+    text-decoration: none;
+    font-size: 1.2rem;
+    border-radius: 10px;
+    transition: background 0.2s;
   }
-  .primary-mobile-links .nav-link {
-    font-size: 0.9rem;
-    padding: 0.3rem 0.5rem;
-    white-space: nowrap;
+  .mobile-link:hover,
+  .mobile-link.active {
+    background: var(--light-gray, #f0f0f0);
+    color: var(--primary, #0B3D91);
   }
-
-  /* Adjust spacing */
-  .navbar-container {
-    flex-wrap: nowrap;
+  .mobile-link-icon {
+    font-size: 1.3rem;
+    color: var(--primary, #0B3D91);
   }
-
-  /* Center login/logout in hamburger */
-  .nav-right {
+  .mobile-divider {
+    height: 1px;
+    background: #e0e0e0;
+    margin: 1rem 0;
+  }
+  .mobile-logout {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.8rem;
+    background: none;
+    border: none;
     width: 100%;
-    text-align: center;
+    text-align: left;
+    font-size: 1.2rem;
+    color: #dc3545;
+    cursor: pointer;
+    border-radius: 10px;
   }
-  .nav-logged {
-    justify-content: center;
+  .mobile-logout:hover {
+    background: #ffeeee;
   }
 }
