@@ -17,7 +17,6 @@ const Navbar = () => {
     setMenuOpen(false);
   };
 
-  // All navigation items
   const allNavItems = [
     { path: '/', label: 'Home', icon: <FaHome /> },
     { path: '/about', label: 'About', icon: <FaInfoCircle /> },
@@ -27,11 +26,11 @@ const Navbar = () => {
     { path: '/contact', label: 'Contact', icon: <FaEnvelope /> },
   ];
 
-  // Primary icons for mobile (always visible)
-  const primaryMobileItems = [
-    { path: '/', icon: <FaHome />, label: 'Home' },
-    { path: '/tournaments', icon: <FaTrophy />, label: 'Tournaments' },
-    { path: '/leaderboard', icon: <FaChartLine />, label: 'Leaderboard' },
+  // Primary text links for mobile (visible outside hamburger)
+  const primaryMobileTextLinks = [
+    { path: '/', label: 'Home' },
+    { path: '/tournaments', label: 'Tournaments' },
+    { path: '/leaderboard', label: 'Leaderboard' },
   ];
 
   return (
@@ -86,17 +85,16 @@ const Navbar = () => {
 
         {/* Mobile Navigation */}
         <div className="nav-mobile">
-          {/* Primary icons */}
-          <div className="mobile-primary-icons">
-            {primaryMobileItems.map(item => (
+          {/* Primary text links */}
+          <div className="mobile-primary-links">
+            {primaryMobileTextLinks.map(item => (
               <NavLink
                 key={item.path}
                 to={item.path}
-                className={({ isActive }) => 'mobile-icon' + (isActive ? ' active' : '')}
+                className={({ isActive }) => 'mobile-text-link' + (isActive ? ' active' : '')}
                 onClick={() => setMenuOpen(false)}
-                title={item.label}
               >
-                {item.icon}
+                {item.label}
               </NavLink>
             ))}
           </div>
@@ -110,7 +108,7 @@ const Navbar = () => {
             {menuOpen ? <FaTimes /> : <FaBars />}
           </button>
 
-          {/* Mobile drawer */}
+          {/* Mobile drawer (unchanged) */}
           <div className={`mobile-drawer ${menuOpen ? 'open' : ''}`}>
             <ul className="mobile-menu">
               {allNavItems.map(item => (
