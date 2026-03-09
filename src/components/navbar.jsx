@@ -17,6 +17,7 @@ const Navbar = () => {
     setMenuOpen(false);
   };
 
+  // All navigation items (used in desktop menu and mobile drawer)
   const allNavItems = [
     { path: '/', label: 'Home', icon: <FaHome /> },
     { path: '/about', label: 'About', icon: <FaInfoCircle /> },
@@ -26,11 +27,11 @@ const Navbar = () => {
     { path: '/contact', label: 'Contact', icon: <FaEnvelope /> },
   ];
 
-  // Primary text links for mobile (visible outside hamburger)
+  // Primary text links for mobile (visible outside hamburger) – renamed
   const primaryMobileTextLinks = [
     { path: '/', label: 'Home' },
-    { path: '/tournaments', label: 'Tournaments' },
-    { path: '/leaderboard', label: 'Leaderboard' },
+    { path: '/tournaments', label: 'Arena' },    // Tournament page
+    { path: '/leaderboard', label: 'Rank' },     // Leaderboard page
   ];
 
   return (
@@ -99,6 +100,20 @@ const Navbar = () => {
             ))}
           </div>
 
+          {/* Profile icon (only when logged in) */}
+          {user && (
+            <button
+              className="mobile-profile-icon"
+              onClick={() => {
+                navigate('/profile');
+                setMenuOpen(false);
+              }}
+              aria-label="Profile"
+            >
+              <FaUser />
+            </button>
+          )}
+
           {/* Hamburger button */}
           <button
             className={`hamburger ${menuOpen ? 'open' : ''}`}
@@ -108,7 +123,7 @@ const Navbar = () => {
             {menuOpen ? <FaTimes /> : <FaBars />}
           </button>
 
-          {/* Mobile drawer (unchanged) */}
+          {/* Mobile drawer */}
           <div className={`mobile-drawer ${menuOpen ? 'open' : ''}`}>
             <ul className="mobile-menu">
               {allNavItems.map(item => (
