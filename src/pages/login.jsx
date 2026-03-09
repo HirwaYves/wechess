@@ -1,12 +1,12 @@
-import './login.css';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import './login.css';
 
 const API = import.meta.env.VITE_API_BASE || '/api';
 
 const Login = () => {
-  const [login, setLogin] = useState(''); // renamed from username to login
+  const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -20,7 +20,7 @@ const Login = () => {
       const res = await fetch(`${API}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ login, password }) // sending 'login' field
+        body: JSON.stringify({ login, password })
       });
 
       let data;
