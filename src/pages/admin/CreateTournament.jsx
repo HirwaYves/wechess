@@ -73,8 +73,6 @@ const CreateTournament = () => {
     }
     setLoading(true);
     try {
-      // Note: api.createTournament should send all fields, including joinUrl and requireLichess.
-      // If your api.js method doesn't include them, update it accordingly.
       await api.createTournament(form);
       addToast('Tournament created successfully', 'success');
       navigate('/admin/tournaments');
