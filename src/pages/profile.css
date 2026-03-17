@@ -38,3 +38,119 @@
   color: var(--text-light);
   font-size: 0.9rem;
 }
+.lichess-section {
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  margin-top: 2rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  border-left: 5px solid var(--secondary, #D4AF37);
+}
+
+.lichess-section h2 {
+  color: var(--primary, #0B3D91);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.lichess-description {
+  color: var(--text-dark, #333);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  font-size: 1rem;
+}
+
+.lichess-action {
+  background: var(--light-gray, #f8f9fa);
+  padding: 1.5rem;
+  border-radius: 12px;
+}
+
+.warning {
+  color: #dc3545;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+.success {
+  color: #28a745;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+.button-group {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.btn-lichess-signup {
+  background: #28a745;
+  color: white;
+  padding: 0.8rem 1.5rem;
+  border-radius: 40px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background 0.2s;
+  display: inline-block;
+}
+
+.btn-lichess-signup:hover {
+  background: #218838;
+  text-decoration: none;
+  color: white;
+}
+
+.or-text {
+  color: var(--text-light, #6c757d);
+  font-weight: 500;
+}
+
+.lichess-form {
+  margin-top: 1rem;
+}
+
+.lichess-form label {
+  display: block;
+  margin-bottom: 1rem;
+  font-weight: 500;
+  color: var(--text-dark, #333);
+}
+
+.lichess-form input {
+  width: 100%;
+  padding: 0.8rem;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  margin-top: 0.5rem;
+  font-size: 1rem;
+}
+
+.lichess-form input:focus {
+  border-color: var(--secondary, #D4AF37);
+  outline: none;
+}
+
+.btn-save {
+  background: var(--primary, #0B3D91);
+  color: white;
+  border: none;
+  padding: 0.8rem 2rem;
+  border-radius: 40px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-save:hover {
+  background: #0a357a;
+}
+
+.btn-save:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
