@@ -53,27 +53,25 @@ function requireAdmin(req, res, next) {
 app.get('/', (req, res) => res.send('WEChess API (Postgres)'));
 
 // Public: list tournaments
-app.get('/api/tournaments', async (req, res) => {
-  const { season_id } = req.query;
-  let query = `
-    SELECT id, title, date, platform, time_control, max_players, entry_type, join_url, season_id
-    FROM tournaments
-  `;
-  const params = [];
-  if (season_id) {
-    query += ' WHERE season_id = $1 ORDER BY date DESC';
-    params.push(season_id);
-  } else {
-    query += ' ORDER BY date DESC';
+app.post('/api/tournaments', requireAuth, requireAdmin, async (req, res) => {
+  const { title, date, platform, timeControl, maxPlayers, entryFee, season, joinUrl, requireLichess } = req.body;
+  if (!title || !date || !platform || !timeControl || !maxPlayers || !season) {
+    return res.status(400).json({ error: 'Missing required fields' });
   }
   try {
-    const { rows } = await pool.query(query, params);
-    res.json(rows);
+    const sql = `
+      INSERT INTO tournaments (title, date, platform, time_control, max_players, entry_type, season_id, join_url, require_lichess)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      RETURNING *
+    `;
+    const values = [title, date, platform, timeControl, maxPlayers, entryFee || 'Free', season, joinUrl || null, requireLichess || false];
+    const { rows } = await pool.query(sql, values);
+    res.status(201).json(rows[0]);
   } catch (err) {
-    console.error('GET /api/tournaments', err);
-    res.status(500).json({ error: 'db error', details: err.message });
+    console.error('POST /api/tournaments', err);
+    res.status(500).json({ error: err.message });
   }
-});
+});;
 
 // Public: list players (minimal info)
 app.get('/api/players', async (req, res) => {
@@ -86,28 +84,6 @@ app.get('/api/players', async (req, res) => {
   }
 });
 
-// Public: participants for a tournament
-app.get('/api/tournaments', async (req, res) => {
-  const { season_id } = req.query;
-  let query = `
-    SELECT id, title, date, platform, time_control, max_players, entry_type, join_url, season_id, require_lichess
-    FROM tournaments
-  `;
-  const params = [];
-  if (season_id) {
-    query += ' WHERE season_id = $1 ORDER BY date DESC';
-    params.push(season_id);
-  } else {
-    query += ' ORDER BY date DESC';
-  }
-  try {
-    const { rows } = await pool.query(query, params);
-    res.json(rows);
-  } catch (err) {
-    console.error('GET /api/tournaments', err);
-    res.status(500).json({ error: 'db error', details: err.message });
-  }
-});
 
 // ---------- Auth: register & login (Postgres) ----------
 
