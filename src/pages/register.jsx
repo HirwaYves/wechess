@@ -14,7 +14,7 @@ const Register = () => {
     email: '',
     confirmEmail: '',
     country: '',
-    lichessUsername: ''  // new field
+    lichessUsername: ''
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -27,7 +27,6 @@ const Register = () => {
   };
 
   const validateForm = () => {
-    // Required fields
     const requiredFields = ['username', 'password', 'firstName', 'lastName', 'email', 'confirmEmail', 'country'];
     for (const field of requiredFields) {
       if (!form[field].trim()) {
@@ -36,26 +35,22 @@ const Register = () => {
       }
     }
 
-    // Username length check
     if (form.username.length < 3) {
       setError('Username must be at least 3 characters long.');
       return false;
     }
 
-    // Email match
     if (form.email !== form.confirmEmail) {
       setError('Email addresses do not match');
       return false;
     }
 
-    // Email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(form.email)) {
       setError('Please enter a valid email address');
       return false;
     }
 
-    // Password length
     if (form.password.length < 3) {
       setError('Password must be at least 3 characters long');
       return false;
@@ -155,7 +150,7 @@ const Register = () => {
             onChange={handleChange} 
             required 
           />
-          {/* New Lichess username field (optional) */}
+          {/* Lichess username field with signup hint */}
           <input 
             name="lichessUsername" 
             type="text"
@@ -163,6 +158,13 @@ const Register = () => {
             value={form.lichessUsername} 
             onChange={handleChange} 
           />
+          <p className="lichess-hint">
+            Don't have a Lichess account?{' '}
+            <a href="https://lichess.org/signup" target="_blank" rel="noopener noreferrer">
+              Create one here
+            </a>
+          </p>
+
           {error && <div className="error">{error}</div>}
           <button type="submit" disabled={loading}>
             {loading ? 'Registering...' : 'Register'}
