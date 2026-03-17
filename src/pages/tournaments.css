@@ -175,3 +175,11 @@
     padding: 0.5rem 0.3rem;
   }
 }
+.lichess-warning p {
+  margin: 0;
+  color: var(--text-light);
+}
+.lichess-warning a {
+  color: var(--primary);
+  text-decoration: underline;
+}
