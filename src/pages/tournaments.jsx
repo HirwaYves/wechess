@@ -8,6 +8,8 @@ const API = import.meta.env.VITE_API_BASE || '/api';
 
 const Tournaments = () => {
   const [tournaments, setTournaments] = useState([]);
+  const [seasons, setSeasons] = useState([]);
+  const [selectedSeason, setSelectedSeason] = useState('');
   const [selectedTournament, setSelectedTournament] = useState(null);
   const [standings, setStandings] = useState([]);
   const [loadingTournaments, setLoadingTournaments] = useState(true);
@@ -36,23 +38,43 @@ const Tournaments = () => {
     }
   }, [isLoggedIn]);
 
+  // Fetch seasons and tournaments
   useEffect(() => {
-    const fetchTournaments = async () => {
+    const fetchSeasonsAndTournaments = async () => {
       try {
-        const res = await fetch(`${API}/api/tournaments`);
-        if (!res.ok) throw new Error('Failed to load tournaments');
-        const data = await res.json();
-        setTournaments(data);
-        if (data.length > 0) setSelectedTournament(data[0].id);
+        const [seasonsRes, tournamentsRes] = await Promise.all([
+          fetch(`${API}/api/seasons`),
+          fetch(`${API}/api/tournaments`)
+        ]);
+        if (!seasonsRes.ok || !tournamentsRes.ok) throw new Error('Failed to load data');
+        const seasonsData = await seasonsRes.json();
+        const tournamentsData = await tournamentsRes.json();
+        setSeasons(seasonsData);
+        setTournaments(tournamentsData);
       } catch (err) {
         addToast(err.message, 'error');
       } finally {
         setLoadingTournaments(false);
       }
     };
-    fetchTournaments();
+    fetchSeasonsAndTournaments();
   }, []);
 
+  // Filter tournaments by selected season
+  const filteredTournaments = selectedSeason
+    ? tournaments.filter(t => t.season_id === parseInt(selectedSeason))
+    : tournaments;
+
+  // When season changes, select first tournament in that season if any
+  useEffect(() => {
+    if (filteredTournaments.length > 0) {
+      setSelectedTournament(filteredTournaments[0].id);
+    } else {
+      setSelectedTournament(null);
+    }
+  }, [selectedSeason, filteredTournaments]);
+
+  // Fetch standings when selected tournament changes
   useEffect(() => {
     if (!selectedTournament) return;
     const fetchStandings = async () => {
@@ -80,14 +102,12 @@ const Tournaments = () => {
       return;
     }
 
-    // Check if user has Lichess username
     if (!userLichess) {
       addToast('You must link your Lichess account before registering for tournaments. Go to your profile.', 'error');
       navigate('/profile');
       return;
     }
 
-    // Confirmation step
     const confirmMessage = `Your Lichess username is "${userLichess}". Is this correct?`;
     if (!window.confirm(confirmMessage)) return;
 
@@ -123,6 +143,9 @@ const Tournaments = () => {
     })
     .map((player, index) => ({ ...player, rank: index + 1 }));
 
+  // Get selected tournament details for join link
+  const selectedTournamentData = tournaments.find(t => t.id === selectedTournament);
+
   return (
     <section className="tournaments-page">
       <div className="container">
@@ -130,97 +153,128 @@ const Tournaments = () => {
 
         {loadingTournaments ? (
           <div className="loading-indicator">Loading tournaments...</div>
-        ) : tournaments.length === 0 ? (
-          <div className="no-data">No tournaments available yet.</div>
         ) : (
           <>
-            <div className="tournament-header">
-              <div className="tournament-selector">
-                <label htmlFor="tournament">Select Tournament:</label>
-                <select
-                  id="tournament"
-                  value={selectedTournament || ''}
-                  onChange={(e) => setSelectedTournament(Number(e.target.value))}
-                >
-                  {tournaments.map((t) => (
-                    <option key={t.id} value={t.id}>
-                      {t.title}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              {isLoggedIn && (
-                <>
-                  {userLichess ? (
-                    <button
-                      className="register-btn"
-                      onClick={handleRegister}
-                      disabled={registering}
-                    >
-                      {registering ? 'Registering...' : 'Register for this tournament'}
-                    </button>
-                  ) : (
-                    <div className="lichess-warning">
-                      <p>You need to <a href="/profile">link your Lichess account</a> first.</p>
-                    </div>
-                  )}
-                </>
-              )}
+            {/* Season selector */}
+            <div className="season-selector">
+              <label htmlFor="season">Select Season:</label>
+              <select
+                id="season"
+                value={selectedSeason}
+                onChange={(e) => setSelectedSeason(e.target.value)}
+              >
+                <option value="">All Seasons</option>
+                {seasons.map(s => (
+                  <option key={s.id} value={s.id}>{s.name}</option>
+                ))}
+              </select>
             </div>
 
-            <div className="view-toggle">
-              <button
-                className={viewMode === 'score' ? 'active' : ''}
-                onClick={() => setViewMode('score')}
-              >
-                By Tournament Score
-              </button>
-              <button
-                className={viewMode === 'rating' ? 'active' : ''}
-                onClick={() => setViewMode('rating')}
-              >
-                By Current Rating
-              </button>
-            </div>
-
-            {loadingStandings ? (
-              <div className="loading-indicator">Loading standings...</div>
-            ) : sortedStandings.length === 0 ? (
-              <div className="no-data">No participants yet.</div>
+            {filteredTournaments.length === 0 ? (
+              <div className="no-data">No tournaments in this season.</div>
             ) : (
-              <div className="standings-table-wrapper">
-                <table className="standings-table">
-                  <thead>
-                    <tr>
-                      <th>Rank</th>
-                      <th>Username</th>
-                      <th>Country</th>
-                      <th>Rating</th>
-                      <th>Score</th>
-                      <th>Wins</th>
-                      <th>Losses</th>
-                      <th>Buchholz</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {sortedStandings.map((player) => (
-                      <tr
-                        key={player.player_id}
-                        className={user?.id === player.player_id ? 'current-user-row' : ''}
-                      >
-                        <td>{player.rank}</td>
-                        <td>{player.username}</td>
-                        <td>{player.country || '—'}</td>
-                        <td>{player.rating}</td>
-                        <td>{player.score}</td>
-                        <td>{player.wins}</td>
-                        <td>{player.losses}</td>
-                        <td>{player.buchholz}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              <>
+                <div className="tournament-header">
+                  <div className="tournament-selector">
+                    <label htmlFor="tournament">Select Tournament:</label>
+                    <select
+                      id="tournament"
+                      value={selectedTournament || ''}
+                      onChange={(e) => setSelectedTournament(Number(e.target.value))}
+                    >
+                      {filteredTournaments.map((t) => (
+                        <option key={t.id} value={t.id}>
+                          {t.title} ({new Date(t.date).toLocaleDateString()})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  {isLoggedIn && (
+                    <>
+                      {userLichess ? (
+                        <button
+                          className="register-btn"
+                          onClick={handleRegister}
+                          disabled={registering}
+                        >
+                          {registering ? 'Registering...' : 'Register for this tournament'}
+                        </button>
+                      ) : (
+                        <div className="lichess-warning">
+                          <p>You need to <a href="/profile">link your Lichess account</a> first.</p>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+
+                {/* Join Link (if available) */}
+                {selectedTournamentData?.join_url && (
+                  <div className="join-link-container">
+                    <p>
+                      <strong>Join the arena:</strong>{' '}
+                      <a href={selectedTournamentData.join_url} target="_blank" rel="noopener noreferrer">
+                        {selectedTournamentData.join_url}
+                      </a>
+                    </p>
+                  </div>
+                )}
+
+                <div className="view-toggle">
+                  <button
+                    className={viewMode === 'score' ? 'active' : ''}
+                    onClick={() => setViewMode('score')}
+                  >
+                    By Tournament Score
+                  </button>
+                  <button
+                    className={viewMode === 'rating' ? 'active' : ''}
+                    onClick={() => setViewMode('rating')}
+                  >
+                    By Current Rating
+                  </button>
+                </div>
+
+                {loadingStandings ? (
+                  <div className="loading-indicator">Loading standings...</div>
+                ) : sortedStandings.length === 0 ? (
+                  <div className="no-data">No participants yet.</div>
+                ) : (
+                  <div className="standings-table-wrapper">
+                    <table className="standings-table">
+                      <thead>
+                        <tr>
+                          <th>Rank</th>
+                          <th>Username</th>
+                          <th>Country</th>
+                          <th>Rating</th>
+                          <th>Score</th>
+                          <th>Wins</th>
+                          <th>Losses</th>
+                          <th>Buchholz</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {sortedStandings.map((player) => (
+                          <tr
+                            key={player.player_id}
+                            className={user?.id === player.player_id ? 'current-user-row' : ''}
+                          >
+                            <td>{player.rank}</td>
+                            <td>{player.username}</td>
+                            <td>{player.country || '—'}</td>
+                            <td>{player.rating}</td>
+                            <td>{player.score}</td>
+                            <td>{player.wins}</td>
+                            <td>{player.losses}</td>
+                            <td>{player.buchholz}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </>
             )}
           </>
         )}
