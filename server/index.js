@@ -87,31 +87,24 @@ app.get('/api/players', async (req, res) => {
 });
 
 // Public: participants for a tournament
-app.get('/api/tournaments/:id/participants', async (req, res) => {
-  const tourId = Number(req.params.id);
-  const sql = `
-    SELECT tp.player_id,
-           p.username,
-           p.first_name || ' ' || p.last_name AS full_name,
-           p.country,
-           p.current_rating AS rating,
-           tp.score,
-           tp.wins,
-           tp.draws,
-           tp.losses,
-           CASE WHEN (tp.wins + tp.losses)=0 THEN 0
-                ELSE ROUND(100.0 * tp.wins / GREATEST((tp.wins + tp.losses),1)::numeric, 2)
-           END AS win_pct
-    FROM tournament_participants tp
-    JOIN players p ON p.id = tp.player_id
-    WHERE tp.tournament_id = $1
-    ORDER BY tp.score DESC, tp.wins DESC, p.current_rating DESC
+app.get('/api/tournaments', async (req, res) => {
+  const { season_id } = req.query;
+  let query = `
+    SELECT id, title, date, platform, time_control, max_players, entry_type, join_url, season_id, require_lichess
+    FROM tournaments
   `;
+  const params = [];
+  if (season_id) {
+    query += ' WHERE season_id = $1 ORDER BY date DESC';
+    params.push(season_id);
+  } else {
+    query += ' ORDER BY date DESC';
+  }
   try {
-    const { rows } = await pool.query(sql, [tourId]);
+    const { rows } = await pool.query(query, params);
     res.json(rows);
   } catch (err) {
-    console.error('GET /api/tournaments/:id/participants', err);
+    console.error('GET /api/tournaments', err);
     res.status(500).json({ error: 'db error', details: err.message });
   }
 });
