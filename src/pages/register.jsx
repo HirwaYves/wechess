@@ -13,7 +13,8 @@ const Register = () => {
     lastName: '',
     email: '',
     confirmEmail: '',
-    country: ''
+    country: '',
+    lichessUsername: ''  // new field
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -22,38 +23,44 @@ const Register = () => {
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
-    // Clear error when user starts typing
     if (error) setError('');
   };
 
   const validateForm = () => {
-    // Check if any field is empty
-    for (const [key, value] of Object.entries(form)) {
-      if (!value.trim()) {
-        setError(`All fields are required. Please fill in ${key.replace(/([A-Z])/g, ' $1').toLowerCase()}`);
+    // Required fields
+    const requiredFields = ['username', 'password', 'firstName', 'lastName', 'email', 'confirmEmail', 'country'];
+    for (const field of requiredFields) {
+      if (!form[field].trim()) {
+        setError(`All fields are required. Please fill in ${field}.`);
         return false;
       }
     }
-    
-    // Check if emails match
+
+    // Username length check
+    if (form.username.length < 3) {
+      setError('Username must be at least 3 characters long.');
+      return false;
+    }
+
+    // Email match
     if (form.email !== form.confirmEmail) {
       setError('Email addresses do not match');
       return false;
     }
-    
-    // Basic email format validation
+
+    // Email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(form.email)) {
       setError('Please enter a valid email address');
       return false;
     }
-    
-    // Password minimum length (optional - you can adjust)
+
+    // Password length
     if (form.password.length < 3) {
       setError('Password must be at least 3 characters long');
       return false;
     }
-    
+
     return true;
   };
 
@@ -68,9 +75,7 @@ const Register = () => {
     setLoading(true);
 
     try {
-      // Remove confirmEmail before sending to API
       const { confirmEmail, ...submitForm } = form;
-      
       const res = await fetch(`${API}/api/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -95,10 +100,11 @@ const Register = () => {
           <input 
             name="username" 
             type="text"
-            placeholder="Username *" 
+            placeholder="Username * (min 3 chars)" 
             value={form.username} 
             onChange={handleChange} 
             required 
+            minLength="3"
           />
           <input 
             name="password" 
@@ -148,6 +154,14 @@ const Register = () => {
             value={form.country} 
             onChange={handleChange} 
             required 
+          />
+          {/* New Lichess username field (optional) */}
+          <input 
+            name="lichessUsername" 
+            type="text"
+            placeholder="Lichess Username (optional – for tournament tracking)" 
+            value={form.lichessUsername} 
+            onChange={handleChange} 
           />
           {error && <div className="error">{error}</div>}
           <button type="submit" disabled={loading}>
