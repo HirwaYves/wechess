@@ -111,18 +111,24 @@ app.get('/api/tournaments/:id/participants', async (req, res) => {
  * body: { username, password, firstName, lastName, email, country }
  */
 app.post('/api/auth/register', async (req, res) => {
-  const { username, password, firstName, lastName, email, country } = req.body;
+  const { username, password, firstName, lastName, email, country, lichessUsername } = req.body;
   if (!username || !password) return res.status(400).json({ error: 'username and password required' });
+
+  // Username length validation
+  if (username.length < 3) {
+    return res.status(400).json({ error: 'Username must be at least 3 characters long' });
+  }
+
   try {
     const salt = bcrypt.genSaltSync(10);
     const hash = bcrypt.hashSync(password, salt);
 
     const sql = `
-      INSERT INTO players (username, password_hash, first_name, last_name, email, country, current_rating, is_active)
-      VALUES ($1,$2,$3,$4,$5,$6,$7, true)
+      INSERT INTO players (username, password_hash, first_name, last_name, email, country, lichess_username, current_rating, is_active)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8, true)
       RETURNING id, username, first_name, last_name, current_rating, is_admin
     `;
-    const vals = [username, hash, firstName || '', lastName || '', email || null, country || null, 1000];
+    const vals = [username, hash, firstName || '', lastName || '', email || null, country || null, lichessUsername || null, 1000];
     const { rows } = await pool.query(sql, vals);
     const user = rows[0];
     const token = makeToken(user);
@@ -181,7 +187,7 @@ app.post('/api/auth/login', async (req, res) => {
 app.get('/api/auth/me', requireAuth, async (req, res) => {
   try {
     const { rows } = await pool.query(
-      'SELECT id, username, first_name, last_name, email, country, current_rating, created_at, is_admin FROM players WHERE id = $1',
+      'SELECT id, username, first_name, last_name, email, country, current_rating, created_at, is_admin, lichess_username FROM players WHERE id = $1',
       [req.user.id]
     );
     if (!rows[0]) return res.status(404).json({ error: 'User not found' });
@@ -189,6 +195,25 @@ app.get('/api/auth/me', requireAuth, async (req, res) => {
   } catch (err) {
     console.error('GET /api/auth/me', err);
     res.status(500).json({ error: 'db error', details: err.message });
+  }
+});
+
+// ---------- Update User Profile (only lichess_username for now) ----------
+app.put('/api/users/profile', requireAuth, async (req, res) => {
+  const { lichessUsername } = req.body;
+  const userId = req.user.id;
+
+  try {
+    await pool.query(
+      'UPDATE players SET lichess_username = $1 WHERE id = $2',
+      [lichessUsername || null, userId]
+    );
+    // Optionally return updated user
+    const { rows } = await pool.query('SELECT id, username, first_name, last_name, email, country, current_rating, lichess_username FROM players WHERE id = $1', [userId]);
+    res.json(rows[0]);
+  } catch (err) {
+    console.error('PUT /api/users/profile', err);
+    res.status(500).json({ error: err.message });
   }
 });
 
