@@ -52,26 +52,28 @@ function requireAdmin(req, res, next) {
 // Health
 app.get('/', (req, res) => res.send('WEChess API (Postgres)'));
 
-// Public: list tournaments
-app.post('/api/tournaments', requireAuth, requireAdmin, async (req, res) => {
-  const { title, date, platform, timeControl, maxPlayers, entryFee, season, joinUrl, requireLichess } = req.body;
-  if (!title || !date || !platform || !timeControl || !maxPlayers || !season) {
-    return res.status(400).json({ error: 'Missing required fields' });
+// Public: list tournaments (with optional season filter, include require_lichess)
+app.get('/api/tournaments', async (req, res) => {
+  const { season_id } = req.query;
+  let query = `
+    SELECT id, title, date, platform, time_control, max_players, entry_type, join_url, season_id, require_lichess
+    FROM tournaments
+  `;
+  const params = [];
+  if (season_id) {
+    query += ' WHERE season_id = $1 ORDER BY date DESC';
+    params.push(season_id);
+  } else {
+    query += ' ORDER BY date DESC';
   }
   try {
-    const sql = `
-      INSERT INTO tournaments (title, date, platform, time_control, max_players, entry_type, season_id, join_url, require_lichess)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-      RETURNING *
-    `;
-    const values = [title, date, platform, timeControl, maxPlayers, entryFee || 'Free', season, joinUrl || null, requireLichess || false];
-    const { rows } = await pool.query(sql, values);
-    res.status(201).json(rows[0]);
+    const { rows } = await pool.query(query, params);
+    res.json(rows);
   } catch (err) {
-    console.error('POST /api/tournaments', err);
-    res.status(500).json({ error: err.message });
+    console.error('GET /api/tournaments', err);
+    res.status(500).json({ error: 'db error', details: err.message });
   }
-});;
+});
 
 // Public: list players (minimal info)
 app.get('/api/players', async (req, res) => {
@@ -84,18 +86,46 @@ app.get('/api/players', async (req, res) => {
   }
 });
 
+// Public: participants for a tournament
+app.get('/api/tournaments/:id/participants', async (req, res) => {
+  const tourId = Number(req.params.id);
+  const sql = `
+    SELECT tp.player_id,
+           p.username,
+           p.first_name || ' ' || p.last_name AS full_name,
+           p.country,
+           p.current_rating AS rating,
+           tp.score,
+           tp.wins,
+           tp.draws,
+           tp.losses,
+           CASE WHEN (tp.wins + tp.losses)=0 THEN 0
+                ELSE ROUND(100.0 * tp.wins / GREATEST((tp.wins + tp.losses),1)::numeric, 2)
+           END AS win_pct
+    FROM tournament_participants tp
+    JOIN players p ON p.id = tp.player_id
+    WHERE tp.tournament_id = $1
+    ORDER BY tp.score DESC, tp.wins DESC, p.current_rating DESC
+  `;
+  try {
+    const { rows } = await pool.query(sql, [tourId]);
+    res.json(rows);
+  } catch (err) {
+    console.error('GET /api/tournaments/:id/participants', err);
+    res.status(500).json({ error: 'db error', details: err.message });
+  }
+});
 
 // ---------- Auth: register & login (Postgres) ----------
 
 /**
  * POST /api/auth/register
- * body: { username, password, firstName, lastName, email, country }
+ * body: { username, password, firstName, lastName, email, country, lichessUsername }
  */
 app.post('/api/auth/register', async (req, res) => {
   const { username, password, firstName, lastName, email, country, lichessUsername } = req.body;
   if (!username || !password) return res.status(400).json({ error: 'username and password required' });
 
-  // Username length validation
   if (username.length < 3) {
     return res.status(400).json({ error: 'Username must be at least 3 characters long' });
   }
@@ -142,7 +172,6 @@ app.post('/api/auth/login', async (req, res) => {
     if (!ok) return res.status(401).json({ error: 'invalid credentials' });
 
     const token = makeToken(user);
-    // Return user info and token
     res.json({
       user: {
         id: user.id,
@@ -189,7 +218,6 @@ app.put('/api/users/profile', requireAuth, async (req, res) => {
       'UPDATE players SET lichess_username = $1 WHERE id = $2',
       [lichessUsername || null, userId]
     );
-    // Optionally return updated user
     const { rows } = await pool.query('SELECT id, username, first_name, last_name, email, country, current_rating, lichess_username FROM players WHERE id = $1', [userId]);
     res.json(rows[0]);
   } catch (err) {
@@ -283,17 +311,17 @@ app.put('/api/registrations/:id/reject', requireAuth, requireAdmin, async (req, 
 
 // ---------- Admin: Create Tournament ----------
 app.post('/api/tournaments', requireAuth, requireAdmin, async (req, res) => {
-  const { title, date, platform, timeControl, maxPlayers, entryFee, season } = req.body;
+  const { title, date, platform, timeControl, maxPlayers, entryFee, season, joinUrl, requireLichess } = req.body;
   if (!title || !date || !platform || !timeControl || !maxPlayers || !season) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
   try {
     const sql = `
-      INSERT INTO tournaments (title, date, platform, time_control, max_players, entry_type, season_id)
-      VALUES ($1, $2, $3, $4, $5, $6, $7)
+      INSERT INTO tournaments (title, date, platform, time_control, max_players, entry_type, season_id, join_url, require_lichess)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
       RETURNING *
     `;
-    const values = [title, date, platform, timeControl, maxPlayers, entryFee || 'Free', season];
+    const values = [title, date, platform, timeControl, maxPlayers, entryFee || 'Free', season, joinUrl || null, requireLichess || false];
     const { rows } = await pool.query(sql, values);
     res.status(201).json(rows[0]);
   } catch (err) {
@@ -371,23 +399,19 @@ app.post('/api/matches', requireAuth, requireAdmin, async (req, res) => {
   try {
     await client.query('BEGIN');
 
-    // Get tournament's season_id
     const tourn = await client.query('SELECT season_id FROM tournaments WHERE id = $1', [tournament_id]);
     if (!tourn.rows[0]) throw new Error('Tournament not found');
     const season_id = tourn.rows[0].season_id;
 
-    // Get current ratings
     const white = await client.query('SELECT current_rating FROM players WHERE id = $1', [white_player_id]);
     const black = await client.query('SELECT current_rating FROM players WHERE id = $1', [black_player_id]);
     if (!white.rows[0] || !black.rows[0]) throw new Error('Player not found');
     const whiteRating = white.rows[0].current_rating;
     const blackRating = black.rows[0].current_rating;
 
-    // Calculate new ratings using elo helper
     const { updateElo } = require('./utils/elo');
     const { newA: newWhite, newB: newBlack } = updateElo(whiteRating, blackRating, result);
 
-    // Insert match record
     const matchSql = `
       INSERT INTO matches
         (tournament_id, season_id, white_player_id, black_player_id, result,
@@ -400,11 +424,9 @@ app.post('/api/matches', requireAuth, requireAdmin, async (req, res) => {
     const matchRes = await client.query(matchSql, matchValues);
     const matchId = matchRes.rows[0].id;
 
-    // Update players' current_rating
     await client.query('UPDATE players SET current_rating = $1 WHERE id = $2', [newWhite, white_player_id]);
     await client.query('UPDATE players SET current_rating = $1 WHERE id = $2', [newBlack, black_player_id]);
 
-    // Update tournament_participants stats
     const updateParticipant = async (playerId, deltaWins, deltaLosses, deltaDraws, deltaScore) => {
       await client.query(`
         INSERT INTO tournament_participants (tournament_id, player_id, score, wins, draws, losses)
@@ -423,7 +445,7 @@ app.post('/api/matches', requireAuth, requireAdmin, async (req, res) => {
     } else if (result === '0-1') {
       await updateParticipant(white_player_id, 0, 1, 0, 0);
       await updateParticipant(black_player_id, 1, 0, 0, 1);
-    } else { // draw
+    } else {
       await updateParticipant(white_player_id, 0, 0, 1, 0.5);
       await updateParticipant(black_player_id, 0, 0, 1, 0.5);
     }
@@ -540,26 +562,20 @@ app.post('/api/auth/forgot-password', async (req, res) => {
   if (!email) return res.status(400).json({ error: 'Email required' });
 
   try {
-    // Find user by email
     const { rows } = await pool.query('SELECT id, email FROM players WHERE email = $1', [email]);
     if (rows.length === 0) {
-      // Don't reveal that email doesn't exist
       return res.json({ message: 'If that email exists, a reset link has been sent.' });
     }
 
     const user = rows[0];
-
-    // Generate a random token (64 chars hex)
     const token = crypto.randomBytes(32).toString('hex');
-    const expires = new Date(Date.now() + 3600000); // 1 hour
+    const expires = new Date(Date.now() + 3600000);
 
-    // Store token and expiry
     await pool.query(
       'UPDATE players SET reset_token = $1, reset_token_expires = $2 WHERE id = $3',
       [token, expires, user.id]
     );
 
-    // Send email using Resend (with test domain)
     try {
       const { Resend } = require('resend');
       const resend = new Resend(process.env.RESEND_API_KEY);
@@ -567,7 +583,7 @@ app.post('/api/auth/forgot-password', async (req, res) => {
       const resetLink = `https://wechess-community.vercel.app/reset-password?token=${token}`;
 
       const emailResult = await resend.emails.send({
-        from: 'WEChess <onboarding@resend.dev>', // Test address – replace with verified domain later
+        from: 'WEChess <onboarding@resend.dev>',
         to: email,
         subject: 'Reset your WEChess password',
         html: `
@@ -579,7 +595,6 @@ app.post('/api/auth/forgot-password', async (req, res) => {
       console.log('Resend success:', emailResult);
     } catch (emailErr) {
       console.error('Resend error details:', emailErr);
-      // Still return success to the user
     }
 
     res.json({ message: 'If that email exists, a reset link has been sent.' });
@@ -595,7 +610,6 @@ app.post('/api/auth/reset-password', async (req, res) => {
   if (!token || !newPassword) return res.status(400).json({ error: 'Token and new password required' });
 
   try {
-    // Find user with valid token
     const { rows } = await pool.query(
       'SELECT id FROM players WHERE reset_token = $1 AND reset_token_expires > NOW()',
       [token]
@@ -603,12 +617,9 @@ app.post('/api/auth/reset-password', async (req, res) => {
     if (rows.length === 0) return res.status(400).json({ error: 'Invalid or expired token' });
 
     const user = rows[0];
-
-    // Hash new password
     const salt = bcrypt.genSaltSync(10);
     const hash = bcrypt.hashSync(newPassword, salt);
 
-    // Update password and clear token
     await pool.query(
       'UPDATE players SET password_hash = $1, reset_token = NULL, reset_token_expires = NULL WHERE id = $2',
       [hash, user.id]
