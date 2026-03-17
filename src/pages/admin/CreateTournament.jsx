@@ -18,7 +18,9 @@ const CreateTournament = () => {
     timeControl: '',
     maxPlayers: '',
     entryFee: '',
-    season: ''
+    season: '',
+    joinUrl: '',
+    requireLichess: false
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -45,7 +47,8 @@ const CreateTournament = () => {
   }, []);
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+    setForm({ ...form, [e.target.name]: value });
     if (errors[e.target.name]) setErrors({ ...errors, [e.target.name]: '' });
   };
 
@@ -70,6 +73,8 @@ const CreateTournament = () => {
     }
     setLoading(true);
     try {
+      // Note: api.createTournament should send all fields, including joinUrl and requireLichess.
+      // If your api.js method doesn't include them, update it accordingly.
       await api.createTournament(form);
       addToast('Tournament created successfully', 'success');
       navigate('/admin/tournaments');
@@ -154,6 +159,33 @@ const CreateTournament = () => {
           </select>
           {errors.season && <span className="admin-error">{errors.season}</span>}
         </div>
+
+        {/* Join URL (optional) */}
+        <AdminFormInput
+          label="Join URL (optional)"
+          id="joinUrl"
+          name="joinUrl"
+          value={form.joinUrl}
+          onChange={handleChange}
+          placeholder="https://lichess.org/tournament/..."
+        />
+
+        {/* Require Lichess checkbox */}
+        <div className="admin-form-group checkbox-group">
+          <label className="checkbox-label">
+            <input
+              type="checkbox"
+              name="requireLichess"
+              checked={form.requireLichess}
+              onChange={handleChange}
+            />
+            <span>Require players to have a linked Lichess account</span>
+          </label>
+          <p className="checkbox-hint">
+            If checked, players must have a Lichess username in their profile before registering.
+          </p>
+        </div>
+
         <div className="admin-form-actions">
           <AdminButton type="submit" disabled={loading}>
             {loading ? 'Creating...' : 'Create Tournament'}
