@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../components/admin/AdminToastContext';
+import { useNavigate } from 'react-router-dom';
 import './tournaments.css';
 
 const API = import.meta.env.VITE_API_BASE || '/api';
@@ -13,10 +14,27 @@ const Tournaments = () => {
   const [loadingStandings, setLoadingStandings] = useState(false);
   const [registering, setRegistering] = useState(false);
   const [viewMode, setViewMode] = useState('score');
+  const [userLichess, setUserLichess] = useState(null);
   const { user } = useAuth();
   const { addToast } = useToast();
+  const navigate = useNavigate();
 
   const isLoggedIn = user !== null || localStorage.getItem('token') !== null;
+
+  // Fetch user's Lichess username when logged in
+  useEffect(() => {
+    if (isLoggedIn) {
+      const token = localStorage.getItem('token');
+      fetch(`${API}/api/auth/me`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+        .then(res => res.json())
+        .then(data => setUserLichess(data.lichess_username || null))
+        .catch(() => setUserLichess(null));
+    } else {
+      setUserLichess(null);
+    }
+  }, [isLoggedIn]);
 
   useEffect(() => {
     const fetchTournaments = async () => {
@@ -61,6 +79,18 @@ const Tournaments = () => {
       addToast('Please log in to register', 'error');
       return;
     }
+
+    // Check if user has Lichess username
+    if (!userLichess) {
+      addToast('You must link your Lichess account before registering for tournaments. Go to your profile.', 'error');
+      navigate('/profile');
+      return;
+    }
+
+    // Confirmation step
+    const confirmMessage = `Your Lichess username is "${userLichess}". Is this correct?`;
+    if (!window.confirm(confirmMessage)) return;
+
     setRegistering(true);
     try {
       const res = await fetch(`${API}/api/registrations`, {
@@ -120,13 +150,21 @@ const Tournaments = () => {
                 </select>
               </div>
               {isLoggedIn && (
-                <button
-                  className="register-btn"
-                  onClick={handleRegister}
-                  disabled={registering}
-                >
-                  {registering ? 'Registering...' : 'Register for this tournament'}
-                </button>
+                <>
+                  {userLichess ? (
+                    <button
+                      className="register-btn"
+                      onClick={handleRegister}
+                      disabled={registering}
+                    >
+                      {registering ? 'Registering...' : 'Register for this tournament'}
+                    </button>
+                  ) : (
+                    <div className="lichess-warning">
+                      <p>You need to <a href="/profile">link your Lichess account</a> first.</p>
+                    </div>
+                  )}
+                </>
               )}
             </div>
 
