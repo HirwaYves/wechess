@@ -95,41 +95,47 @@ const Tournaments = () => {
   }, [selectedTournament]);
 
   const handleRegister = async () => {
-    if (!selectedTournament) return;
-    const token = localStorage.getItem('token');
-    if (!token) {
-      addToast('Please log in to register', 'error');
-      return;
-    }
+  if (!selectedTournament) return;
+  const token = localStorage.getItem('token');
+  if (!token) {
+    addToast('Please log in to register', 'error');
+    return;
+  }
 
+  // Get tournament details to check requirement
+  const tournament = tournaments.find(t => t.id === selectedTournament);
+  
+  // If tournament requires Lichess, verify user has it
+  if (tournament?.require_lichess) {
     if (!userLichess) {
-      addToast('You must link your Lichess account before registering for tournaments. Go to your profile.', 'error');
+      addToast('This tournament requires a linked Lichess account. Please add it in your profile first.', 'error');
       navigate('/profile');
       return;
     }
-
+    
     const confirmMessage = `Your Lichess username is "${userLichess}". Is this correct?`;
     if (!window.confirm(confirmMessage)) return;
+  }
 
-    setRegistering(true);
-    try {
-      const res = await fetch(`${API}/api/registrations`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ tournamentId: selectedTournament }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Registration failed');
-      addToast('Registration submitted! Pending confirmation.', 'success');
-    } catch (err) {
-      addToast(err.message, 'error');
-    } finally {
-      setRegistering(false);
-    }
-  };
+  setRegistering(true);
+  try {
+    const res = await fetch(`${API}/api/registrations`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ tournamentId: selectedTournament }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Registration failed');
+    addToast('Registration submitted! Pending confirmation.', 'success');
+  } catch (err) {
+    addToast(err.message, 'error');
+  } finally {
+    setRegistering(false);
+  }
+};
 
   const sortedStandings = [...standings]
     .sort((a, b) => {
