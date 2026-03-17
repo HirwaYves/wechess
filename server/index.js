@@ -54,8 +54,20 @@ app.get('/', (req, res) => res.send('WEChess API (Postgres)'));
 
 // Public: list tournaments
 app.get('/api/tournaments', async (req, res) => {
+  const { season_id } = req.query;
+  let query = `
+    SELECT id, title, date, platform, time_control, max_players, entry_type, join_url, season_id
+    FROM tournaments
+  `;
+  const params = [];
+  if (season_id) {
+    query += ' WHERE season_id = $1 ORDER BY date DESC';
+    params.push(season_id);
+  } else {
+    query += ' ORDER BY date DESC';
+  }
   try {
-    const { rows } = await pool.query('SELECT id, title, date, platform, time_control, max_players, entry_type FROM tournaments ORDER BY date DESC');
+    const { rows } = await pool.query(query, params);
     res.json(rows);
   } catch (err) {
     console.error('GET /api/tournaments', err);
@@ -459,7 +471,7 @@ app.post('/api/matches', requireAuth, requireAdmin, async (req, res) => {
 });
 
 // ---------- Seasons (admin only) ----------
-app.get('/api/seasons', requireAuth, requireAdmin, async (req, res) => {
+app.get('/api/seasons', async (req, res) => {
   try {
     const { rows } = await pool.query('SELECT * FROM seasons ORDER BY start_date DESC');
     res.json(rows);
