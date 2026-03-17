@@ -39,3 +39,22 @@
   font-size: 0.85rem;
   color: var(--text-light);
 }
+.checkbox-group {
+  margin: 1rem 0;
+}
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-weight: 500;
+}
+.checkbox-label input[type="checkbox"] {
+  width: auto;
+  margin: 0;
+}
+.checkbox-hint {
+  margin-left: 1.7rem;
+  font-size: 0.85rem;
+  color: var(--text-light);
+}
