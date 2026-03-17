@@ -183,3 +183,29 @@
   color: var(--primary);
   text-decoration: underline;
 }
+.season-selector {
+  margin: 1rem 0;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.season-selector select {
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--primary);
+  border-radius: 30px;
+  font-size: 1rem;
+  background: white;
+  cursor: pointer;
+  min-width: 200px;
+}
+.join-link-container {
+  background: #e8f0fe;
+  padding: 1rem;
+  border-radius: 12px;
+  margin: 1rem 0;
+  word-break: break-all;
+}
+.join-link-container a {
+  color: var(--primary);
+  text-decoration: underline;
+}
