@@ -87,11 +87,13 @@ app.get('/api/players', async (req, res) => {
 });
 
 // Public: participants for a tournament
+\
 app.get('/api/tournaments/:id/participants', async (req, res) => {
   const tourId = Number(req.params.id);
   const sql = `
     SELECT tp.player_id,
            p.username,
+           p.lichess_username,
            p.first_name || ' ' || p.last_name AS full_name,
            p.country,
            p.current_rating AS rating,
