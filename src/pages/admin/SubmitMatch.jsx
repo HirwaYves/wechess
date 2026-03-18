@@ -54,9 +54,9 @@ const SubmitMatch = () => {
     }
   };
 
-  // Helper to format player display
+  // Helper to format player display – always show lichess_username (wechess_username) if lichess exists
   const formatPlayerName = (player) => {
-    if (player.lichess_username && player.lichess_username !== player.username) {
+    if (player.lichess_username) {
       return `${player.lichess_username} (${player.username})`;
     }
     return player.username;
