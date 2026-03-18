@@ -344,7 +344,27 @@ app.put('/api/players/:id/toggle', requireAuth, requireAdmin, async (req, res) =
     res.status(500).json({ error: err.message });
   }
 });
+// Check if current user is a confirmed participant for a tournament
+app.get('/api/tournaments/:id/participant-status', requireAuth, async (req, res) => {
+  const tournamentId = Number(req.params.id);
+  const userId = req.user.id;
 
+  try {
+    const { rows } = await pool.query(
+      `SELECT status FROM registrations 
+       WHERE tournament_id = $1 AND player_id = $2`,
+      [tournamentId, userId]
+    );
+    if (rows.length === 0) {
+      return res.json({ isConfirmed: false });
+    }
+    const isConfirmed = rows[0].status === 'confirmed';
+    res.json({ isConfirmed });
+  } catch (err) {
+    console.error('GET /api/tournaments/:id/participant-status', err);
+    res.status(500).json({ error: err.message });
+  }
+});
 // Register for a tournament (authenticated users)
 app.post('/api/registrations', requireAuth, async (req, res) => {
   const { tournamentId, paymentRef } = req.body;
