@@ -87,7 +87,6 @@ app.get('/api/players', async (req, res) => {
 });
 
 // Public: participants for a tournament
-\
 app.get('/api/tournaments/:id/participants', async (req, res) => {
   const tourId = Number(req.params.id);
   const sql = `
@@ -109,13 +108,7 @@ app.get('/api/tournaments/:id/participants', async (req, res) => {
     WHERE tp.tournament_id = $1
     ORDER BY tp.score DESC, tp.wins DESC, p.current_rating DESC
   `;
-  try {
-    const { rows } = await pool.query(sql, [tourId]);
-    res.json(rows);
-  } catch (err) {
-    console.error('GET /api/tournaments/:id/participants', err);
-    res.status(500).json({ error: 'db error', details: err.message });
-  }
+  // ... rest
 });
 
 // ---------- Auth: register & login (Postgres) ----------
