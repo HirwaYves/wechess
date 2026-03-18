@@ -54,12 +54,12 @@ const SubmitMatch = () => {
     }
   };
 
-  // Helper to format player display – always show lichess_username (wechess_username) if lichess exists
+  // Format: LichessUsername (WEChessUsername)
   const formatPlayerName = (player) => {
     if (player.lichess_username) {
       return `${player.lichess_username} (${player.username})`;
     }
-    return player.username;
+    return player.username; // fallback if no Lichess username
   };
 
   return (
