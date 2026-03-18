@@ -54,6 +54,14 @@ const SubmitMatch = () => {
     }
   };
 
+  // Helper to format player display
+  const formatPlayerName = (player) => {
+    if (player.lichess_username && player.lichess_username !== player.username) {
+      return `${player.lichess_username} (${player.username})`;
+    }
+    return player.username;
+  };
+
   return (
     <div className="admin-submit-match">
       <h1>Submit Match Result</h1>
@@ -74,7 +82,7 @@ const SubmitMatch = () => {
                 <option value="">Select white</option>
                 {players.map(p => (
                   <option key={p.player_id} value={p.player_id}>
-                    {p.lichess_username || p.username} ({p.username})
+                    {formatPlayerName(p)}
                   </option>
                 ))}
               </select>
@@ -85,7 +93,7 @@ const SubmitMatch = () => {
                 <option value="">Select black</option>
                 {players.map(p => (
                   <option key={p.player_id} value={p.player_id}>
-                    {p.lichess_username || p.username} ({p.username})
+                    {formatPlayerName(p)}
                   </option>
                 ))}
               </select>
