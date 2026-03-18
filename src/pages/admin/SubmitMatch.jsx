@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import AdminButton from '../../components/admin/AdminButton';
 import { useToast } from '../../components/admin/AdminToastContext';
 import { api } from '../../services/api';
-import './SubmitMatch.css'; // optional – you can create this file or remove if not needed
+import './SubmitMatch.css';
 
 const SubmitMatch = () => {
   const [tournaments, setTournaments] = useState([]);
@@ -72,14 +72,22 @@ const SubmitMatch = () => {
               <label>White Player</label>
               <select value={whiteId} onChange={(e) => setWhiteId(e.target.value)} required>
                 <option value="">Select white</option>
-                {players.map(p => <option key={p.player_id} value={p.player_id}>{p.full_name} ({p.username})</option>)}
+                {players.map(p => (
+                  <option key={p.player_id} value={p.player_id}>
+                    {p.lichess_username || p.username} ({p.username})
+                  </option>
+                ))}
               </select>
             </div>
             <div className="form-group">
               <label>Black Player</label>
               <select value={blackId} onChange={(e) => setBlackId(e.target.value)} required>
                 <option value="">Select black</option>
-                {players.map(p => <option key={p.player_id} value={p.player_id}>{p.full_name} ({p.username})</option>)}
+                {players.map(p => (
+                  <option key={p.player_id} value={p.player_id}>
+                    {p.lichess_username || p.username} ({p.username})
+                  </option>
+                ))}
               </select>
             </div>
             <div className="form-group">
