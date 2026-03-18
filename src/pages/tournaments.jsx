@@ -17,6 +17,7 @@ const Tournaments = () => {
   const [registering, setRegistering] = useState(false);
   const [viewMode, setViewMode] = useState('score');
   const [userLichess, setUserLichess] = useState(null);
+  const [isConfirmedParticipant, setIsConfirmedParticipant] = useState(false);
   const { user } = useAuth();
   const { addToast } = useToast();
   const navigate = useNavigate();
@@ -94,48 +95,59 @@ const Tournaments = () => {
     fetchStandings();
   }, [selectedTournament]);
 
-  const handleRegister = async () => {
-  if (!selectedTournament) return;
-  const token = localStorage.getItem('token');
-  if (!token) {
-    addToast('Please log in to register', 'error');
-    return;
-  }
-
-  // Get tournament details to check requirement
-  const tournament = tournaments.find(t => t.id === selectedTournament);
-  
-  // If tournament requires Lichess, verify user has it
-  if (tournament?.require_lichess) {
-    if (!userLichess) {
-      addToast('This tournament requires a linked Lichess account. Please add it in your profile first.', 'error');
-      navigate('/profile');
+  // Fetch participant confirmation status when tournament changes and user logged in
+  useEffect(() => {
+    if (!isLoggedIn || !selectedTournament) {
+      setIsConfirmedParticipant(false);
       return;
     }
-    
-    const confirmMessage = `Your Lichess username is "${userLichess}". Is this correct?`;
-    if (!window.confirm(confirmMessage)) return;
-  }
+    const token = localStorage.getItem('token');
+    fetch(`${API}/api/tournaments/${selectedTournament}/participant-status`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then(res => res.json())
+      .then(data => setIsConfirmedParticipant(data.isConfirmed))
+      .catch(() => setIsConfirmedParticipant(false));
+  }, [selectedTournament, isLoggedIn]);
 
-  setRegistering(true);
-  try {
-    const res = await fetch(`${API}/api/registrations`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ tournamentId: selectedTournament }),
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Registration failed');
-    addToast('Registration submitted! Pending confirmation.', 'success');
-  } catch (err) {
-    addToast(err.message, 'error');
-  } finally {
-    setRegistering(false);
-  }
-};
+  const handleRegister = async () => {
+    if (!selectedTournament) return;
+    const token = localStorage.getItem('token');
+    if (!token) {
+      addToast('Please log in to register', 'error');
+      return;
+    }
+
+    const tournament = tournaments.find(t => t.id === selectedTournament);
+    if (tournament?.require_lichess) {
+      if (!userLichess) {
+        addToast('This tournament requires a linked Lichess account. Please add it in your profile first.', 'error');
+        navigate('/profile');
+        return;
+      }
+      const confirmMessage = `Your Lichess username is "${userLichess}". Is this correct?`;
+      if (!window.confirm(confirmMessage)) return;
+    }
+
+    setRegistering(true);
+    try {
+      const res = await fetch(`${API}/api/registrations`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ tournamentId: selectedTournament }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Registration failed');
+      addToast('Registration submitted! Pending confirmation.', 'success');
+    } catch (err) {
+      addToast(err.message, 'error');
+    } finally {
+      setRegistering(false);
+    }
+  };
 
   const sortedStandings = [...standings]
     .sort((a, b) => {
@@ -149,7 +161,6 @@ const Tournaments = () => {
     })
     .map((player, index) => ({ ...player, rank: index + 1 }));
 
-  // Get selected tournament details for join link
   const selectedTournamentData = tournaments.find(t => t.id === selectedTournament);
 
   return (
@@ -161,7 +172,6 @@ const Tournaments = () => {
           <div className="loading-indicator">Loading tournaments...</div>
         ) : (
           <>
-            {/* Season selector */}
             <div className="season-selector">
               <label htmlFor="season">Select Season:</label>
               <select
@@ -214,8 +224,8 @@ const Tournaments = () => {
                   )}
                 </div>
 
-                {/* Join Link (if available) */}
-                {selectedTournamentData?.join_url && (
+                {/* Join Link – only for confirmed participants */}
+                {selectedTournamentData?.join_url && isConfirmedParticipant && (
                   <div className="join-link-container">
                     <p>
                       <strong>Join the arena:</strong>{' '}
