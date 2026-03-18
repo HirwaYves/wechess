@@ -122,7 +122,7 @@ const Profile = () => {
                 type="text"
                 value={lichessUsername}
                 onChange={(e) => setLichessUsername(e.target.value)}
-                placeholder="e.g., MagnusCarlsen"
+                placeholder="e.g., yourlichesusername"
               />
             </label>
             <button type="submit" disabled={updating} className="btn-save">
