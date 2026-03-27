@@ -368,6 +368,7 @@ app.get('/api/tournaments/:id/participant-status', requireAuth, async (req, res)
 });
 
 // Register for a tournament (authenticated users)
+
 app.post('/api/registrations', requireAuth, async (req, res) => {
   const { tournamentId, paymentRef } = req.body;
   const playerId = req.user.id;
@@ -376,11 +377,16 @@ app.post('/api/registrations', requireAuth, async (req, res) => {
   try {
     // Get tournament details
     const tournRes = await pool.query(
-      'SELECT max_players, require_lichess, auto_confirm FROM tournaments WHERE id = $1',
+      'SELECT max_players, require_lichess, auto_confirm, registration_closed FROM tournaments WHERE id = $1',
       [tournamentId]
     );
     if (tournRes.rows.length === 0) return res.status(404).json({ error: 'tournament not found' });
-    const { max_players, require_lichess, auto_confirm } = tournRes.rows[0];
+    const { max_players, require_lichess, auto_confirm, registration_closed } = tournRes.rows[0];
+
+    // NEW: Check if registration is closed
+    if (registration_closed) {
+      return res.status(403).json({ error: 'Registration for this tournament is closed' });
+    }
 
     // Check capacity
     const full = await tournamentIsFull(pool, tournamentId);
@@ -406,7 +412,7 @@ app.post('/api/registrations', requireAuth, async (req, res) => {
 
     if (rows.length === 0) return res.status(409).json({ error: 'already registered' });
 
-    // If auto_confirm, also add to tournament_participants
+    // If auto_confirm, add to tournament_participants
     if (auto_confirm) {
       await pool.query(
         `INSERT INTO tournament_participants (tournament_id, player_id, score, wins, draws, losses, buchholz)
