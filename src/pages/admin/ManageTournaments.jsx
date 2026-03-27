@@ -7,6 +7,8 @@ import { useToast } from '../../components/admin/AdminToastContext';
 import { api } from '../../services/api';
 import './ManageTournaments.css';
 
+const API_BASE = import.meta.env.VITE_API_BASE || '/api';
+
 const ManageTournaments = () => {
   const [tournaments, setTournaments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -54,6 +56,22 @@ const ManageTournaments = () => {
     }
   };
 
+  const toggleRegistrationClosed = async (tournament) => {
+    const token = localStorage.getItem('token');
+    try {
+      const res = await fetch(`${API_BASE}/api/tournaments/${tournament.id}/toggle-registration`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (!res.ok) throw new Error('Failed to toggle registration');
+      const data = await res.json();
+      addToast(`Registration ${data.registration_closed ? 'closed' : 'opened'}`, 'success');
+      loadTournaments(); // refresh list
+    } catch (err) {
+      addToast(err.message, 'error');
+    }
+  };
+
   const columns = [
     { key: 'id', label: 'ID' },
     { key: 'title', label: 'Title' },
@@ -62,11 +80,21 @@ const ManageTournaments = () => {
     { key: 'time_control', label: 'Time Control' },
     { key: 'max_players', label: 'Max Players' },
     { key: 'entry_type', label: 'Entry' },
+    {
+      key: 'registration_closed',
+      label: 'Registration',
+      render: (val) => val ? '🔒 Closed' : '✅ Open'
+    }
   ];
 
   const actions = [
     { label: 'Edit', onClick: (row) => navigate(`/admin/edit-tournament/${row.id}`), variant: 'secondary' },
-    { label: 'Delete', onClick: (row) => handleDelete(row.id), variant: 'danger' },
+    {
+      label: (row) => row.registration_closed ? 'Open Registration' : 'Close Registration',
+      onClick: toggleRegistrationClosed,
+      variant: (row) => row.registration_closed ? 'success' : 'warning'
+    },
+    { label: 'Delete', onClick: (row) => handleDelete(row.id), variant: 'danger' }
   ];
 
   return (
@@ -82,7 +110,9 @@ const ManageTournaments = () => {
       <AdminModal isOpen={modalOpen} onClose={() => setModalOpen(false)} title={`Participants: ${selectedTournament?.title}`}>
         {participants.length === 0 ? <p>No participants yet.</p> : (
           <table className="admin-modal-table">
-            <thead><tr><th>Player</th><th>Username</th><th>Rating</th><th>Score</th><th>Wins</th><th>Losses</th></tr></thead>
+            <thead>
+              <tr><th>Player</th><th>Username</th><th>Rating</th><th>Score</th><th>Wins</th><th>Losses</th></tr>
+            </thead>
             <tbody>
               {participants.map(p => (
                 <tr key={p.player_id}>
