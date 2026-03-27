@@ -20,7 +20,8 @@ const CreateTournament = () => {
     entryFee: '',
     season: '',
     joinUrl: '',
-    requireLichess: false
+    requireLichess: false,
+    autoConfirm: false  // new field
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -181,6 +182,22 @@ const CreateTournament = () => {
           </label>
           <p className="checkbox-hint">
             If checked, players must have a Lichess username in their profile before registering.
+          </p>
+        </div>
+
+        {/* Auto-confirm checkbox */}
+        <div className="admin-form-group checkbox-group">
+          <label className="checkbox-label">
+            <input
+              type="checkbox"
+              name="autoConfirm"
+              checked={form.autoConfirm}
+              onChange={handleChange}
+            />
+            <span>Auto‑confirm registrations (players join immediately)</span>
+          </label>
+          <p className="checkbox-hint">
+            If checked, players can register and join the tournament without admin approval.
           </p>
         </div>
 
