@@ -345,6 +345,28 @@ app.put('/api/players/:id/toggle', requireAuth, requireAdmin, async (req, res) =
     res.status(500).json({ error: err.message });
   }
 });
+
+// Admin: Toggle tournament registration closed status
+app.put('/api/tournaments/:id/toggle-registration', requireAuth, requireAdmin, async (req, res) => {
+  const tournamentId = Number(req.params.id);
+  try {
+    const { rows } = await pool.query(
+      'SELECT registration_closed FROM tournaments WHERE id = $1',
+      [tournamentId]
+    );
+    if (!rows[0]) return res.status(404).json({ error: 'Tournament not found' });
+    const newStatus = !rows[0].registration_closed;
+    await pool.query(
+      'UPDATE tournaments SET registration_closed = $1 WHERE id = $2',
+      [newStatus, tournamentId]
+    );
+    res.json({ id: tournamentId, registration_closed: newStatus });
+  } catch (err) {
+    console.error('PUT /api/tournaments/:id/toggle-registration', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Check if current user is a confirmed participant for a tournament
 app.get('/api/tournaments/:id/participant-status', requireAuth, async (req, res) => {
   const tournamentId = Number(req.params.id);
