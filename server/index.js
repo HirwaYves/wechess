@@ -360,25 +360,57 @@ app.get('/api/tournaments/:id/participant-status', requireAuth, async (req, res)
     res.status(500).json({ error: err.message });
   }
 });
+
 // Register for a tournament (authenticated users)
 app.post('/api/registrations', requireAuth, async (req, res) => {
   const { tournamentId, paymentRef } = req.body;
-  const playerId = req.user.id; // from token
+  const playerId = req.user.id;
   if (!tournamentId) return res.status(400).json({ error: 'tournamentId required' });
 
   try {
+    // Get tournament details
+    const tournRes = await pool.query(
+      'SELECT max_players, require_lichess, auto_confirm FROM tournaments WHERE id = $1',
+      [tournamentId]
+    );
+    if (tournRes.rows.length === 0) return res.status(404).json({ error: 'tournament not found' });
+    const { max_players, require_lichess, auto_confirm } = tournRes.rows[0];
+
+    // Check capacity
     const full = await tournamentIsFull(pool, tournamentId);
     if (full) return res.status(409).json({ error: 'tournament full' });
 
+    // If tournament requires Lichess, verify user has it
+    if (require_lichess) {
+      const userRes = await pool.query('SELECT lichess_username FROM players WHERE id = $1', [playerId]);
+      if (!userRes.rows[0]?.lichess_username) {
+        return res.status(400).json({ error: 'This tournament requires a linked Lichess account' });
+      }
+    }
+
+    // Insert registration
+    const status = auto_confirm ? 'confirmed' : 'pending';
     const sql = `
-      INSERT INTO registrations (tournament_id, player_id, payment_ref)
-      VALUES ($1, $2, $3)
+      INSERT INTO registrations (tournament_id, player_id, payment_ref, status)
+      VALUES ($1, $2, $3, $4)
       ON CONFLICT (tournament_id, player_id) DO NOTHING
       RETURNING *
     `;
-    const { rows } = await pool.query(sql, [tournamentId, playerId, paymentRef || null]);
+    const { rows } = await pool.query(sql, [tournamentId, playerId, paymentRef || null, status]);
+
     if (rows.length === 0) return res.status(409).json({ error: 'already registered' });
-    res.json(rows[0]);
+
+    // If auto_confirm, also add to tournament_participants
+    if (auto_confirm) {
+      await pool.query(
+        `INSERT INTO tournament_participants (tournament_id, player_id, score, wins, draws, losses, buchholz)
+         VALUES ($1, $2, 0, 0, 0, 0, 0)
+         ON CONFLICT (tournament_id, player_id) DO NOTHING`,
+        [tournamentId, playerId]
+      );
+    }
+
+    res.json({ ...rows[0], autoConfirmed: auto_confirm });
   } catch (err) {
     console.error('POST /api/registrations', err);
     if (err.message && err.message.includes('tournament not found')) return res.status(404).json({ error: 'tournament not found' });
