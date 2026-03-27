@@ -108,7 +108,13 @@ app.get('/api/tournaments/:id/participants', async (req, res) => {
     WHERE tp.tournament_id = $1
     ORDER BY tp.score DESC, tp.wins DESC, p.current_rating DESC
   `;
-  // ... rest
+  try {
+    const { rows } = await pool.query(sql, [tourId]);
+    res.json(rows);
+  } catch (err) {
+    console.error('GET /api/tournaments/:id/participants', err);
+    res.status(500).json({ error: 'db error', details: err.message });
+  }
 });
 
 // ---------- Auth: register & login (Postgres) ----------
