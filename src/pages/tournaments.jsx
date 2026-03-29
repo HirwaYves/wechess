@@ -112,13 +112,17 @@ const Tournaments = () => {
 
   const handleRegister = async () => {
     if (!selectedTournament) return;
+    const tournament = tournaments.find(t => t.id === selectedTournament);
+    if (tournament?.is_completed) {
+      addToast('This tournament has already ended. Registration is closed.', 'error');
+      return;
+    }
     const token = localStorage.getItem('token');
     if (!token) {
       addToast('Please log in to register', 'error');
       return;
     }
 
-    const tournament = tournaments.find(t => t.id === selectedTournament);
     if (tournament?.require_lichess) {
       if (!userLichess) {
         addToast('This tournament requires a linked Lichess account. Please add it in your profile first.', 'error');
@@ -201,11 +205,29 @@ const Tournaments = () => {
                       {filteredTournaments.map((t) => (
                         <option key={t.id} value={t.id}>
                           {t.title} ({new Date(t.date).toLocaleDateString()})
+                          {t.is_completed && ' (Completed)'}
                         </option>
                       ))}
                     </select>
                   </div>
-                  {isLoggedIn && (
+
+                  {/* Registration prompt for non-logged-in users */}
+                  {!isLoggedIn && (
+                    <div className="register-prompt">
+                      <p>
+                        👋 You need an account to join tournaments.{' '}
+                        <a href="/register">Register here</a> or <a href="/login">log in</a>.
+                      </p>
+                    </div>
+                  )}
+
+                  {isLoggedIn && selectedTournamentData?.is_completed && (
+                    <div className="completed-notice">
+                      🏁 This tournament has ended. Registration is closed.
+                    </div>
+                  )}
+
+                  {isLoggedIn && !selectedTournamentData?.is_completed && (
                     <>
                       {userLichess ? (
                         <button
@@ -224,8 +246,15 @@ const Tournaments = () => {
                   )}
                 </div>
 
-                {/* Join Link – only for confirmed participants */}
-                {selectedTournamentData?.join_url && isConfirmedParticipant && (
+                {/* Completed badge next to selected tournament name */}
+                {selectedTournamentData?.is_completed && (
+                  <div className="completed-badge">
+                    ⏹️ This tournament is marked as completed.
+                  </div>
+                )}
+
+                {/* Join Link – only for confirmed participants (and not completed) */}
+                {selectedTournamentData?.join_url && isConfirmedParticipant && !selectedTournamentData?.is_completed && (
                   <div className="join-link-container">
                     <p>
                       <strong>Join the arena:</strong>{' '}
