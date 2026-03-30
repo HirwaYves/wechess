@@ -135,3 +135,13 @@
 .forgot-link a:hover {
   text-decoration: underline;
 }
+/* Feature icons styling */
+.feature-card .feature-icon {
+  color: #4A90E2;  /* sky blue */
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.feature-card:hover .feature-icon {
+  transform: scale(1.05);
+  color: #2c7ac9;  /* slightly darker on hover */
+}
