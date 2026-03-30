@@ -3,21 +3,29 @@ function expectedScore(Ra, Rb) {
   return 1 / (1 + Math.pow(10, (Rb - Ra) / 400));
 }
 
+/**
+ * Simple rating adjustment with fixed points.
+ * @param {number} Ra - current rating of player A (white)
+ * @param {number} Rb - current rating of player B (black)
+ * @param {string} result - '1-0' (white wins), '0-1' (black wins), '1/2-1/2' (draw)
+ * @param {number} K - ignored, kept for compatibility
+ * @returns {object} { newA, newB, deltaA, deltaB }
+ */
 function updateElo(Ra, Rb, result, K = 20) {
-  // result: '1-0' (white wins), '0-1' (black wins), '1/2-1/2' (draw)
-  let Sa;
-  if (result === '1-0') Sa = 1;
-  else if (result === '0-1') Sa = 0;
-  else Sa = 0.5;
+  let deltaA, deltaB;
+  if (result === '1-0') {
+    deltaA = 3;
+    deltaB = -3;
+  } else if (result === '0-1') {
+    deltaA = -3;
+    deltaB = 3;
+  } else { // draw
+    deltaA = 1;
+    deltaB = 1;
+  }
 
-  const Ea = expectedScore(Ra, Rb);
-  const Eb = 1 - Ea;
-
-  const Ra_new = Math.round(Ra + K * (Sa - Ea));
-  const Rb_new = Math.round(Rb + K * ((1 - Sa) - Eb));
-
-  const deltaA = Ra_new - Ra;
-  const deltaB = Rb_new - Rb;
+  const Ra_new = Ra + deltaA;
+  const Rb_new = Rb + deltaB;
 
   return { newA: Ra_new, newB: Rb_new, deltaA, deltaB };
 }
