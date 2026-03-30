@@ -1,5 +1,7 @@
-import Button from '../components/button'  
-import './home.css'
+import { Link } from 'react-router-dom';
+import { FaUsers, FaTrophy, FaChartLine } from 'react-icons/fa';
+import Button from '../components/button';
+import './home.css';
 
 const Home = () => {
   return (
@@ -18,35 +20,41 @@ const Home = () => {
               Join WEChess
             </Button>
           </div>
-          <div className="hero-bg"></div> {/* subtle knight illustration via CSS */}
+          <div className="hero-bg"></div>
         </div>
       </section>
 
       {/* Features Section */}
       <section className="features">
         <div className="container">
-          <h2 className="section-title">why WEChess?</h2>
+          <h2 className="section-title">Why WEChess?</h2>
           <div className="features-grid">
-            <div className="feature-card">
-              <div className="feature-icon">👥</div>
+            <Link to="/" className="feature-card" style={{ textDecoration: 'none' }}>
+              <div className="feature-icon">
+                <FaUsers />
+              </div>
               <h3>Community</h3>
               <p>Friendly players, discussion boards, and team events.</p>
-            </div>
-            <div className="feature-card">
-              <div className="feature-icon">🏆</div>
+            </Link>
+            <Link to="/tournaments" className="feature-card" style={{ textDecoration: 'none' }}>
+              <div className="feature-icon">
+                <FaTrophy />
+              </div>
               <h3>Tournaments</h3>
               <p>Regular online and over‑the‑board tournaments for all levels.</p>
-            </div>
-            <div className="feature-card">
-              <div className="feature-icon">📊</div>
+            </Link>
+            <Link to="/leaderboard" className="feature-card" style={{ textDecoration: 'none' }}>
+              <div className="feature-icon">
+                <FaChartLine />
+              </div>
               <h3>Rankings</h3>
               <p>Live rating updates and performance analytics.</p>
-            </div>
+            </Link>
           </div>
         </div>
       </section>
     </>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;
